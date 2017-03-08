@@ -1,4 +1,4 @@
-.cardinity .clearfix {
+/*.cardinity .clearfix {
     clear: both;
 }
 
@@ -21,7 +21,7 @@
 }
 
 /* Form */
-.cardinity form {
+/*.cardinity form {
     margin: 0 auto 25px auto;
     width: 320px;
 }
@@ -50,7 +50,7 @@
 }
 
 /* Form inputs */
-.cardinity form .card-pan {
+/*.cardinity form .card-pan {
     width: 170px;
 }
 

@@ -1,3 +1,8 @@
+/**
+ * @author      Cardinity
+ * @link        https://cardinity.com
+ * @license     The MIT License (MIT)
+ */
 $(document).ready(function () {
 
     $('.card-pan').payment('formatCardNumber');
