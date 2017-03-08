@@ -1,0 +1,19 @@
+.cardinity form input[type=text] {
+    padding: 0 5px;
+    height: 20px;
+    border: 1px solid #ccc;
+}
+
+.cardinity .cart_navigation .exclusive_large {
+    margin: 0 auto;
+}
+
+.cardinity form select.currency {
+    width: auto;
+    position: relative;
+    top: 4px;
+}
+
+.cardinity .total-amount-block .price {
+    top: 0;
+}

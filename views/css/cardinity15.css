@@ -1,0 +1,15 @@
+.cardinity form input[type=text] {
+    padding: 0 5px;
+    height: 20px;
+    border: 1px solid #ccc;
+}
+
+.cardinity .cart_navigation .button-medium {
+    margin-bottom: 15px;
+}
+
+.cardinity form select.currency {
+    width: auto;
+    position: relative;
+    top: 4px;
+}

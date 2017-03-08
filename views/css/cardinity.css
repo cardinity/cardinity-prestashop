@@ -1,0 +1,107 @@
+.cardinity .clearfix {
+    clear: both;
+}
+
+.cardinity .top_block {
+    margin-top: 25px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.cardinity .top_block .logo {
+    margin: 10px 10px 20px 10px;
+}
+
+.cardinity .top_block .logo img {
+    margin-right: 5px;
+}
+
+.cardinity .top_block div {
+    font-size: 13px;
+}
+
+/* Form */
+.cardinity form {
+    margin: 0 auto 25px auto;
+    width: 320px;
+}
+
+.cardinity .cart_navigation {
+    margin-top: 30px;
+}
+
+.cardinity .form-horizontal .control-group {
+    margin-bottom: 20px;
+}
+
+.cardinity .form-horizontal .control-label {
+    float: left;
+    width: 120px;
+    padding-top: 5px;
+    text-align: right;
+}
+
+.cardinity .form-horizontal .controls {
+    margin-left: 140px;
+}
+
+.cardinity form select.currency {
+    width: 170px;
+}
+
+/* Form inputs */
+.cardinity form .card-pan {
+    width: 170px;
+}
+
+.cardinity form .controls .selector {
+    display: inline-block;
+}
+
+.cardinity form .expiration-month {
+    width: 58px;
+    display: inline-block;
+    text-align: center;
+}
+
+.cardinity form .expiration-year {
+    width: 73px;
+    display: inline-block;
+    text-align: center;
+}
+
+.cardinity form .cvc {
+    width: 40px;
+    text-align: center;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.cardinity form .card-holder {
+    width: 170px;
+}
+
+.cardinity form .has-error .form-control {
+    border: red solid 1px;
+}
+
+.cardinity .total-amount-block .price {
+    position: relative;
+    top: 5px;
+    font-size: 19px;
+    color: #000;
+    font-weight: bold;
+}
+
+.cardinity .cart_navigation {
+    text-align: center;
+}
+
+.cardinity .cart_navigation .button-medium {
+    float: none;
+    margin-bottom: 25px;
+}
+
+.cardinity .alert {
+    margin-bottom: 20px;
+}

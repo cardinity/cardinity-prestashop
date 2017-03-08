@@ -1,0 +1,15 @@
+@media (max-width: 484px) {
+    .cardinity .top_block .logo img {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .cardinity form {
+        margin-left: -17px;
+    }
+
+    .cardinity .form-horizontal .controls {
+        margin-left: 130px;
+    }
+}
