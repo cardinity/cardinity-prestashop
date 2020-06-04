@@ -16,3 +16,5 @@ Don’t forget to change permissions back after installation.
 To configure the module, on your PrestaShop admin area go to "Modules" and then to "Installed modules", find Cardinity module and click on "Configure".
  
 There is only one section in module’s configuration page. You need to enter Consumer Key and Consumer Secret which you can find on your Cardinity account’s member’s area (navigate to Integration --> API Settings).
+
+After a successful configuration and before starting to sell your products, you may need to clear the cache in order to fix broken CSS. You can do so by navigating to `Advanced Parameters` (`Configure` block) -> `Performance` -> Click the `Clear cache` button.
