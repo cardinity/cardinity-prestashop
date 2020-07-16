@@ -17,25 +17,30 @@ class CardinityRedirectModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
 
-        $payment_id = urldecode(Tools::getValue('payment_id'));
-        $url = urldecode(Tools::getValue('url'));
-        $data = urldecode(Tools::getValue('data'));
-        $link = new Link();
-        $callback_url = $link->getModuleLink('cardinity', 'process');
-        $order = $this->module->getPaymentOrder($payment_id);
-        $order = new Order($order['id_order']);
-
-        if ($this->module->validateOrderPayment($order)) {
-            $this->context->smarty->assign(array(
-                'cardinityUrl' => $url,
-                'cardinityData' => $data,
-                'cardinityCallbackUrl' => $callback_url,
-                'cardinityPaymentId' => $payment_id
-            ));
-
-            $this->setTemplate('module:cardinity/views/templates/front/redirect.tpl');
+        if(Configuration::get('CARDINITY_EXTERNAL') == 1) {
+            $this->context->smarty->assign('attributes', $_POST);
+            return $this->setTemplate('module:cardinity/views/templates/front/redirect_external.tpl');
         } else {
-            $this->setTemplate('module:cardinity/views/templates/front/payment_process_error.tpl');
+            $payment_id = urldecode(Tools::getValue('payment_id'));
+            $url = urldecode(Tools::getValue('url'));
+            $data = urldecode(Tools::getValue('data'));
+            $link = new Link();
+            $callback_url = $link->getModuleLink('cardinity', 'process');
+            $order = $this->module->getPaymentOrder($payment_id);
+            $order = new Order($order['id_order']);
+
+            if ($this->module->validateOrderPayment($order)) {
+                $this->context->smarty->assign(array(
+                    'cardinityUrl' => $url,
+                    'cardinityData' => $data,
+                    'cardinityCallbackUrl' => $callback_url,
+                    'cardinityPaymentId' => $payment_id
+                ));
+
+                $this->setTemplate('module:cardinity/views/templates/front/redirect.tpl');
+            } else {
+                $this->setTemplate('module:cardinity/views/templates/front/payment_process_error.tpl');
+            }
         }
     }
 }

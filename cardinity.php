@@ -29,17 +29,23 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->version = '2.0.0';
+        $this->version = '2.1.0';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
         $config = Configuration::getMultiple(array(
             'CARDINITY_CONSUMER_KEY',
-            'CARDINITY_CONSUMER_SECRET'
+            'CARDINITY_CONSUMER_SECRET',
+            'CARDINITY_EXTERNAL',
+            'CARDINITY_PROJECT_KEY',
+            'CARDINITY_PROJECT_SECRET'
         ));
 
         $this->consumer_key = (isset($config['CARDINITY_CONSUMER_KEY'])) ? $config['CARDINITY_CONSUMER_KEY'] : 0;
         $this->consumer_secret = (isset($config['CARDINITY_CONSUMER_SECRET'])) ? $config['CARDINITY_CONSUMER_SECRET'] : 0;
+        $this->external = (isset($config['CARDINITY_EXTERNAL'])) ? $config['CARDINITY_EXTERNAL'] : 0;
+        $this->project_key = (isset($config['CARDINITY_PROJECT_KEY'])) ? $config['CARDINITY_PROJECT_KEY'] : 0;
+        $this->project_secret = (isset($config['CARDINITY_PROJECT_SECRET'])) ? $config['CARDINITY_PROJECT_SECRET'] : 0;
 
         $this->bootstrap = true;
 
@@ -96,6 +102,9 @@ class Cardinity extends PaymentModule
         return (
             Configuration::deleteByName('CARDINITY_CONSUMER_KEY')
             && Configuration::deleteByName('CARDINITY_CONSUMER_SECRET')
+            && Configuration::deleteByName('CARDINITY_PROJECT_KEY')
+            && Configuration::deleteByName('CARDINITY_PROJECT_SECRET')
+            && Configuration::deleteByName('CARDINITY_EXTERNAL')
             && Configuration::deleteByName('CARDINITY_PENDING')
             && $order_state_pending->delete()
             && parent::uninstall()
@@ -135,6 +144,9 @@ class Cardinity extends PaymentModule
             if (Tools::getValue('consumer_key')) {
                 Configuration::updateValue('CARDINITY_CONSUMER_KEY', Tools::getValue('consumer_key'));
                 Configuration::updateValue('CARDINITY_CONSUMER_SECRET', Tools::getValue('consumer_secret'));
+                Configuration::updateValue('CARDINITY_EXTERNAL', Tools::getValue('external'));
+                Configuration::updateValue('CARDINITY_PROJECT_KEY', Tools::getValue('project_key'));
+                Configuration::updateValue('CARDINITY_PROJECT_SECRET', Tools::getValue('project_secret'));
 
                 return $this->displayConfirmation($this->l('Settings updated'));
             }
@@ -186,6 +198,36 @@ class Cardinity extends PaymentModule
                         'label' => $this->l('Consumer Secret'),
                         'name' => 'consumer_secret',
                         'required' => true
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('External checkout option'),
+                        'name' => 'external',
+                        'desc' => $this->l('Enable to send your customers to Cardinity External Checkout page.'),
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('Disabled')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Project Key'),
+                        'name' => 'project_key',
+                        'required' => false
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Project Secret'),
+                        'name' => 'project_secret',
+                        'required' => false
                     )
                 ),
                 'submit' => array(
@@ -220,7 +262,10 @@ class Cardinity extends PaymentModule
     {
         return array(
             'consumer_key' => Configuration::get('CARDINITY_CONSUMER_KEY'),
-            'consumer_secret' => Configuration::get('CARDINITY_CONSUMER_SECRET')
+            'consumer_secret' => Configuration::get('CARDINITY_CONSUMER_SECRET'),
+            'external' => Configuration::get('CARDINITY_EXTERNAL'),
+            'project_key' => Configuration::get('CARDINITY_PROJECT_KEY'),
+            'project_secret' => Configuration::get('CARDINITY_PROJECT_SECRET')
         );
     }
 
@@ -359,12 +404,94 @@ class Cardinity extends PaymentModule
             'this_path_ssl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
                 . htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8') . __PS_BASE_URI__ . 'modules/' . $this->name . '/'
         ));
+        if(Configuration::get('CARDINITY_EXTERNAL') == 1){
+            $payment_options = array(
+                $this->getExternalPaymentOption($params),
+            );
+        } else {
+            $payment_options = array(
+                $this->getEmbeddedPaymentOption(),
+            );
+        }
 
-        $payment_options = array(
-            $this->getEmbeddedPaymentOption(),
-        );
+        
 
         return $payment_options;
+    }
+
+    public function getExternalPaymentOption($params)
+    {
+        // get currency
+        $currency = new Currency($params['cart']->id_currency);
+        // get address, from which we will get a country name and from that we will get a country code
+        $address = new Address($params['cart']->id_address_delivery);
+        $country = new Country($address->id_country);
+        $attributes = [
+            "amount" => $params['cart']->getOrderTotal(),
+            "currency" => $currency->iso_code,
+            "country" => $country->iso_code,
+            "order_id" => $params['cart']->id,
+            "description" => 'PS' . $params['cart']->id,
+            "project_id" => Configuration::get('CARDINITY_PROJECT_KEY'),
+            "return_url" => $this->context->link->getModuleLink($this->name, 'return'),
+        ];
+        ksort($attributes);
+
+        $message = '';
+        foreach($attributes as $key => $value) {
+            $message .= $key.$value;
+        }
+
+        $signature = hash_hmac('sha256', $message, $this->project_secret);
+        $externalOption = new PaymentOption();
+        $externalOption->setCallToActionText($this->l('Cardinity'))
+                       ->setAction($this->context->link->getModuleLink($this->name, 'redirect', array(), true))
+                       ->setInputs([
+                           'amount' => [
+                               'name' => 'amount',
+                               'type' => 'hidden',
+                               'value' => $attributes['amount']
+                           ],
+                           'currency' => [
+                                'name' => 'currency',
+                                'type' => 'hidden',
+                                'value' => $attributes['currency']
+                            ],
+                            'country' => [
+                                'name' => 'country',
+                                'type' => 'hidden',
+                                'value' => $attributes['country']
+                            ],
+                            'order_id' => [
+                                'name' => 'order_id',
+                                'type' => 'hidden',
+                                'value' => $attributes['order_id']
+                            ],
+                            'description' => [
+                                'name' => 'description',
+                                'type' => 'hidden',
+                                'value' => $attributes['description']
+                            ],
+                            'project_id' => [
+                                'name' => 'project_id',
+                                'type' => 'hidden',
+                                'value' => $attributes['project_id']
+                            ],
+                            'return_url' => [
+                                'name' => 'return_url',
+                                'type' => 'hidden',
+                                'value' => $attributes['return_url']
+                            ],
+                            'signature' => [
+                                'name' => 'signature',
+                                'type' => 'hidden',
+                                'value' => $signature
+                            ],
+                       ])
+                       ->setAdditionalInformation($this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/hook/payment_external.tpl'))
+                       ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'));
+
+        return $externalOption;
     }
 
     // After Payment Method was Checked - Method for Payment Options in 1.7

@@ -100,7 +100,7 @@
                     
                     <div class="col-xs-4">
                         <select name="expiration_year" class="expiration-year form-control" id="expirationYear">
-                            {for $year=date('Y') to (date('Y') + 19)}
+                            {for $year=date('Y') to date('Y', strtotime('+ 19 years'))}
                                 <option value="{$year|intval}"
                                         {if isset($input['expiration_year']) && $input['expiration_year'] == $year}selected{/if}>
                                     {$year|escape:'htmlall':'UTF-8'}
