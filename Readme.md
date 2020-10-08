@@ -43,7 +43,6 @@ Simple payment process - you sign the contract with Cardinity and get all servic
 * PCI-DSS Compliant payment provider for safe payments
 * E-commerce, Recurring and MOTO type payments
 * No monthly fees, no set-up fees
-* Pay only €0.25 + 2.4% per transaction
 
 
 **INSTALLATION**
