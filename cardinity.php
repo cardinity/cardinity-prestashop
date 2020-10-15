@@ -427,10 +427,12 @@ class Cardinity extends PaymentModule
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
         $attributes = [
-            "amount" => $params['cart']->getOrderTotal(),
+            //amount must be in format #0.00
+            "amount" => number_format ( $params['cart']->getOrderTotal(), 2, "." , "" ),
             "currency" => $currency->iso_code,
             "country" => $country->iso_code,
-            "order_id" => $params['cart']->id,
+            //order_id must be 2 to 5 char
+            "order_id" => str_pad($params['cart']->id, 3, '0', STR_PAD_LEFT),
             "description" => 'PS' . $params['cart']->id,
             "project_id" => Configuration::get('CARDINITY_PROJECT_KEY'),
             "return_url" => $this->context->link->getModuleLink($this->name, 'return'),
