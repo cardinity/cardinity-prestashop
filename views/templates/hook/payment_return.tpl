@@ -4,7 +4,7 @@
 * @license      The MIT License (MIT)
 *}
 {if $status == 'ok'}
-    <p>{l s='Your order on' mod='cardinity'} <span class="bold">{$shop_name|escape:'htmlall':'UTF-8'}</span> {l s='is complete.' mod='cardinity'}
+    <p>{l s='Your order on' mod='cardinity'} <span class="bold"></span> {l s='is complete.' mod='cardinity'}
         <br /><br />
         {l s='We received your payment and your order #' mod='cardinity'}
         <strong>{$id_order|intval}</strong> {l s='is in preparation.' mod='cardinity'}
