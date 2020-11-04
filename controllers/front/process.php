@@ -134,13 +134,13 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                         "notification_url" => $this->context->link->getModuleLink('cardinity', 'process'), 
                         "browser_info" => [
                             "accept_header" => "text/html",
-                            "browser_language" => "en-US",
-                            "screen_width" => 1024,
-                            "screen_height" => 768,
+                            "browser_language" => strip_tags(trim(Tools::getValue('browser_language'))),
+                            "screen_width" => strip_tags(trim(Tools::getValue('screen_width'))),
+                            "screen_height" => strip_tags(trim(Tools::getValue('screen_height'))),
                             'challenge_window_size' => "390x400",
                             "user_agent" => $_SERVER['HTTP_USER_AGENT'],
-                            "color_depth" => 24,
-                            "time_zone" => -60
+                            "color_depth" => strip_tags(trim(Tools::getValue('color_depth'))),
+                            "time_zone" => strip_tags(trim(Tools::getValue('time_zone')))
                         ],
                     ],
                 ));

@@ -143,8 +143,26 @@
                         </button>
                     </div>
                 </div>
+
+                <input type='hidden' id='screen_width' name='screen_width' value='' />                
+                <input type='hidden' id='screen_height' name='screen_height' value='' />                
+                <input type='hidden' id='browser_language' name='browser_language' value='' />                
+                <input type='hidden' id='color_depth' name='color_depth' value='' />                
+                <input type='hidden' id='time_zone' name='time_zone' value='' />
+
             </form>
         </div>
+        <script type="text/javascript">
+            {literal}
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById("screen_width").value = screen.availWidth;
+                document.getElementById("screen_height").value = screen.availHeight;
+                document.getElementById("browser_language").value = navigator.language;
+                document.getElementById("color_depth").value = screen.colorDepth;
+                document.getElementById("time_zone").value = new Date().getTimezoneOffset();
+            });
+            {/literal}
+        </script>
     
     </section>
     
