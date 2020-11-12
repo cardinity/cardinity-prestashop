@@ -135,12 +135,12 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                         "browser_info" => [
                             "accept_header" => "text/html",
                             "browser_language" => strip_tags(trim(Tools::getValue('browser_language'))),
-                            "screen_width" => strip_tags(trim(Tools::getValue('screen_width'))),
-                            "screen_height" => strip_tags(trim(Tools::getValue('screen_height'))),
-                            'challenge_window_size' => "390x400",
+                            "screen_width" => (int) strip_tags(trim(Tools::getValue('screen_width'))),
+                            "screen_height" => (int) strip_tags(trim(Tools::getValue('screen_height'))),
+                            'challenge_window_size' => strip_tags(trim(Tools::getValue('challenge_window_size'))),
                             "user_agent" => $_SERVER['HTTP_USER_AGENT'],
-                            "color_depth" => strip_tags(trim(Tools::getValue('color_depth'))),
-                            "time_zone" => strip_tags(trim(Tools::getValue('time_zone')))
+                            "color_depth" => (int) strip_tags(trim(Tools::getValue('color_depth'))),
+                            "time_zone" => (int) strip_tags(trim(Tools::getValue('time_zone')))
                         ],
                     ],
                 ));
