@@ -430,7 +430,7 @@ class Cardinity extends PaymentModule
             "amount" => $params['cart']->getOrderTotal(),
             "currency" => $currency->iso_code,
             "country" => $country->iso_code,
-            "order_id" => $params['cart']->id,
+            "order_id" => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
             "description" => 'PS' . $params['cart']->id,
             "project_id" => Configuration::get('CARDINITY_PROJECT_KEY'),
             "return_url" => $this->context->link->getModuleLink($this->name, 'return'),
