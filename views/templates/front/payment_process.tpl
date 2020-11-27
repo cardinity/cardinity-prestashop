@@ -156,8 +156,8 @@
         <script type="text/javascript">
             {literal}
             document.addEventListener("DOMContentLoaded", function() {
-                document.getElementById("screen_width").value = window.availWidth;
-                document.getElementById("screen_height").value = window.availHeight;
+                document.getElementById("screen_width").value = window.innerWidth;
+                document.getElementById("screen_height").value = window.innerHeight;
                 document.getElementById("browser_language").value = navigator.language;
                 document.getElementById("color_depth").value = screen.colorDepth;
                 document.getElementById("time_zone").value = new Date().getTimezoneOffset();
