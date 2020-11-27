@@ -29,12 +29,14 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
       
         
         if (empty($order_id) && !empty($payment_id)) {
+            //its a 3dsv1
             $order = $this->module->getPaymentOrder($payment_id);
             $order = new Order($order['id_order']);
         }elseif (empty($order_id) && !empty($threeDSSessionData)) {
+            //its a 3dsv2
             $order = $this->module->getPaymentOrder($threeDSSessionData);
             $order = new Order($order['id_order']);
-        }else {
+        }else {            
             $order = new Order($order_id);
         }
           
@@ -49,6 +51,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
 
             // If 3-D
             if (empty($order_id) && !empty($payment_id)) {
+                
                 
                 $pares = Tools::getValue('PaRes');
                 $data = array('authorize_data' => $pares);
@@ -91,6 +94,20 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                         'index.php?controller=order-confirmation&id_cart=' . $cart->id .
                         '&id_module=' . $this->module->id . '&id_order=' . $order->id . '&key=' . $customer->secure_key
                     );
+                }else if ($response->status == 'pending') {
+                    //3dsv2 failed with pending, retry for 3dsv1
+                    $url = $response->authorization_information->url;
+                    $data = $response->authorization_information->data;
+                    $link = new Link();
+                    $url_params = array(
+                        'is_v2' => urlencode(0),
+                        'url' => urlencode($url),
+                        'data' => urlencode($data),
+                        'payment_id' => urlencode($response->id)
+                    );
+
+                    PrestaShopLogger::addLog('Cardinity: Redirected to 3D secure page', 1, null, null, null, true);
+                    Tools::redirect($link->getModuleLink('cardinity', 'redirect', $url_params));
                 }
 
                 // Validation errors are returned in errors array
