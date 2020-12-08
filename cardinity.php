@@ -13,7 +13,7 @@ class Cardinity extends PaymentModule {
 	{
 		$this->name = 'cardinity';
 		$this->tab = 'payments_gateways';
-		$this->version = '1.4.1';
+		$this->version = '1.4.2';
 		$this->author = 'Cardinity';
 		$this->module_key = '132b5bda972a4f28b26d559db88e26ba';
 
