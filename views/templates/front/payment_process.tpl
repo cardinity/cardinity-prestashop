@@ -113,5 +113,52 @@
                 </button>
             {/if}
         </p>
+
+        <input type='hidden' id='screen_width' name='screen_width' value='' />                
+                <input type='hidden' id='screen_height' name='screen_height' value='' />                
+                <input type='hidden' id='browser_language' name='browser_language' value='' />                
+                <input type='hidden' id='challenge_window_size' name='challenge_window_size' value='' />
+                <input type='hidden' id='color_depth' name='color_depth' value='' />                
+                <input type='hidden' id='time_zone' name='time_zone' value='' />
     </form>
 </div>
+<script type="text/javascript">
+{literal}
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("screen_width").value = window.innerWidth;
+    document.getElementById("screen_height").value = window.innerHeight;
+    document.getElementById("browser_language").value = navigator.language;
+    document.getElementById("color_depth").value = screen.colorDepth;
+    document.getElementById("time_zone").value = new Date().getTimezoneOffset();
+
+    var availChallengeWindowSizes = [
+                    [600, 400],
+                    [500, 600],
+                    [390, 400],
+                    [250, 400]
+    ];
+
+    var cardinity_screen_width = window.innerWidth;
+    var cardinity_screen_height = window.innerHeight;
+    document.getElementById("challenge_window_size").value = 'full-screen';
+
+                //display below 800x600        
+    if (!(cardinity_screen_width > 800 && cardinity_screen_height > 600)) {                        
+                    //find largest acceptable size
+        availChallengeWindowSizes.every(function(element, index) {
+            console.log(element);
+            if (element[0] > cardinity_screen_width || element[1] > cardinity_screen_height) {
+                                //this challenge window size is not acceptable
+                console.log('skip');
+                return true;
+            } else {
+                document.getElementById("challenge_window_size").value = element[0]+'x'+element[1];
+                console.log(element[0]+'x'+element[1]);
+                return false;
+            }        
+        });
+    }
+                
+});
+{/literal}
+</script>

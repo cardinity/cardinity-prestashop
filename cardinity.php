@@ -347,6 +347,8 @@ class Cardinity extends PaymentModule {
 		else
 			$current_state = $order->current_state;
 
+		Logger::addLog("VALIDATING PAYMENT: id = $order->id, valid = $order->valid,  crrent state = $current_state, ", 1, $response->status, null, null, true);
+
 		if ($order->id
 			&& $order->module == $this->name
 			&& $cookie->id_customer == $order->id_customer
@@ -367,7 +369,12 @@ class Cardinity extends PaymentModule {
 		Db::getInstance()->execute('
             INSERT INTO '._DB_PREFIX_.'cardinity (id_shop, id_payment, id_order)
             VALUES ('.$id_shop.', "'.$response->id.'", '.$order_id.')
-        ');
+		');
+
+		Logger::addLog("SAVING PAYMENT :".'
+			INSERT INTO '._DB_PREFIX_.'cardinity (id_shop, id_payment, id_order)
+			VALUES ('.$id_shop.', "'.$response->id.'", '.$order_id.')
+		', 1, $response->status, null, null, true);
 	}
 
 	public function getPaymentOrder($payment_id)

@@ -9,14 +9,32 @@ class CardinityCallbackModuleFrontController extends ModuleFrontController {
 
 	public function postProcess()
 	{
-		$payment_id = Tools::getValue('MD');
-		$pares = Tools::getValue('PaRes');
+
+
+
+		$callbackParams = Tools::getAllValues();
+
+		if(isset($callbackParams['MD'])){
+
+			//its 3ds v1 callback
+			$payment_id = Tools::getValue('MD');
+			$pares = Tools::getValue('PaRes');
+			$data = array('authorize_data' => $pares);
+
+		}else{
+
+			//its 3ds v2 callback
+			$payment_id = Tools::getValue('threeDSSessionData');
+			$cres = Tools::getValue('cres');
+			$data = array('cres' => $cres);
+		}
+
 		$order = $this->module->getPaymentOrder($payment_id);
 		$order = new Order($order['id_order']);
 		$cart = new Cart($order->id_cart);
 		$customer = new Customer($cart->id_customer);
 		$currency = new Currency($order->id_currency);
-		$data = array('authorize_data' => $pares);
+
 
 		if ($this->module->validateOrderPayment($order))
 		{
@@ -28,10 +46,24 @@ class CardinityCallbackModuleFrontController extends ModuleFrontController {
 
 				Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id
 					.'&id_module='.$this->module->id.'&id_order='.$order->id.'&key='.$customer->secure_key);
-			}
 
-			// Validation errors are returned in errors array
-			if ($response->status == 'declined' && isset($response->error))
+			}elseif($response->status == 'pending' && $response->authorization_information){
+				//need v1 auth fallback
+
+				$url = $response->authorization_information->url;
+				$data = $response->authorization_information->data;
+				$link = new Link();
+				$url_params = array(
+					'url'        => urlencode($url),
+					'data'       => urlencode($data),
+					'payment_id' => urlencode($response->id),
+					'is_v2' => urlencode(0),
+				);
+
+				Tools::redirect($link->getModuleLink('cardinity', 'redirect', $url_params));
+
+			}elseif ($response->status == 'declined' && isset($response->error))
+				// Validation errors are returned in errors array
 				$this->errors[] = $response->error;
 			elseif ($response->status == 402)
 				$this->errors[] = $response->detail;
