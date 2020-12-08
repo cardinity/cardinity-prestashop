@@ -16,7 +16,26 @@ class CardinityProcessModuleFrontController extends ModuleFrontController {
 		parent::initContent();
 
 		$order_id = (int)Tools::getValue('order_id');
-		$this->order = new Order($order_id);
+
+		$payment_id = trim(Tools::getValue('MD'));
+        $threeDSSessionData = trim(Tools::getValue('threeDSSessionData'));
+
+
+
+		if (empty($order_id) && !empty($payment_id)) {
+            //its a 3dsv1
+            $paymentOrder = $this->module->getPaymentOrder($payment_id);
+            $this->order = new Order($paymentOrder['id_order']);
+        }elseif (empty($order_id) && !empty($threeDSSessionData)) {
+            //its a 3dsv2
+            $paymentOrder = $this->module->getPaymentOrder($threeDSSessionData);
+            $this->order = new Order($paymentOrder['id_order']);
+        }else {
+            $this->order = new Order($order_id);
+        }
+
+
+
 		$currency = new Currency($this->order->id_currency);
 		$cart = new Cart($this->order->id_cart);
 
@@ -48,7 +67,20 @@ class CardinityProcessModuleFrontController extends ModuleFrontController {
 						'exp_month' => (int)Tools::getValue('expiration_month'),
 						'cvc'       => strip_tags(trim(Tools::getValue('cvc'))),
 						'holder'    => strip_tags(trim(Tools::getValue('card_holder')))
-					)
+					),
+					'threeds2_data' =>  array(
+						"notification_url" => $this->context->link->getModuleLink('cardinity', 'callback'),
+                        "browser_info" => array(
+                            "accept_header" => "text/html",
+                            "browser_language" => strip_tags(trim(Tools::getValue('browser_language'))),
+                            "screen_width" => (int) strip_tags(trim(Tools::getValue('screen_width'))),
+                            "screen_height" => (int) strip_tags(trim(Tools::getValue('screen_height'))),
+                            'challenge_window_size' => strip_tags(trim(Tools::getValue('challenge_window_size'))),
+                            "user_agent" => $_SERVER['HTTP_USER_AGENT'],
+                            "color_depth" => (int) strip_tags(trim(Tools::getValue('color_depth'))),
+                            "time_zone" => (int) strip_tags(trim(Tools::getValue('time_zone')))
+						),
+					),
 				));
 
 				if ($response->status == 'approved')
@@ -59,18 +91,54 @@ class CardinityProcessModuleFrontController extends ModuleFrontController {
 						.'&id_module='.$this->module->id.'&id_order='.$this->order->id.'&key='.$customer->secure_key);
 				} elseif ($response->status == 'pending')
 				{
+
+
+
 					$this->module->savePayment($response, $this->order->id);
 
-					$url = $response->authorization_information->url;
-					$data = $response->authorization_information->data;
-					$link = new Link();
-					$url_params = array(
-						'url'        => urlencode($url),
-						'data'       => urlencode($data),
-						'payment_id' => urlencode($response->id)
-					);
 
-					Tools::redirect($link->getModuleLink('cardinity', 'redirect', $url_params));
+					if($response->threeds2_data){
+
+
+						$acs_url = $response->threeds2_data->acs_url;
+						$creq = $response->threeds2_data->creq;
+
+						Logger::addLog("CREQ recievedd : ".$creq, 3, $response->status, null, null, true);
+
+
+						$link = new Link();
+						$url_params = array(
+							'acs_url'        => urlencode($acs_url),
+							'creq'       => urlencode($creq),
+							'payment_id' => urlencode($response->id),
+							'threeDSSessionData' => urlencode($response->id),
+							'is_v2' => urlencode(1),
+						);
+
+						Logger::addLog(print_r($url_params, true), 3, $response->status, null, null, true);
+
+
+						Tools::redirect($link->getModuleLink('cardinity', 'redirect', $url_params));
+
+					}elseif($response->authorization_information){
+
+						Logger::addLog(print_r($response->authorization_information, true), 3, $response->status, null, null, true);
+
+						$url = $response->authorization_information->url;
+						$data = $response->authorization_information->data;
+						$link = new Link();
+						$url_params = array(
+							'url'        => urlencode($url),
+							'data'       => urlencode($data),
+							'payment_id' => urlencode($response->id),
+							'is_v2' => urlencode(0),
+						);
+
+						Tools::redirect($link->getModuleLink('cardinity', 'redirect', $url_params));
+					}
+
+
+
 				}
 
 				// Validation errors are returned in errors array
