@@ -414,7 +414,7 @@ class Cardinity extends PaymentModule
             );
         }
 
-        
+
 
         return $payment_options;
     }
@@ -427,7 +427,7 @@ class Cardinity extends PaymentModule
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
         $attributes = [
-            "amount" => $params['cart']->getOrderTotal(),
+            "amount" =>  number_format( $params['cart']->getOrderTotal() , 2),
             "currency" => $currency->iso_code,
             "country" => $country->iso_code,
             "order_id" => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
@@ -508,7 +508,7 @@ class Cardinity extends PaymentModule
 
     /*protected function generateForm()
     {
-        
+
     }*/
 
     public function hookPaymentReturn($params)
