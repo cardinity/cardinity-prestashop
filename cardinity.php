@@ -8,10 +8,10 @@
  * @link      https://cardinity.com
  */
 
+use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+
 include_once(_PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthStore.php');
 include_once(_PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthRequester.php');
-
-use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -408,7 +408,7 @@ class Cardinity extends PaymentModule
             'this_path_ssl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
                 . htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8') . __PS_BASE_URI__ . 'modules/' . $this->name . '/'
         ));
-        if(Configuration::get('CARDINITY_EXTERNAL') == 1){
+        if (Configuration::get('CARDINITY_EXTERNAL') == 1) {
             $payment_options = array(
                 $this->getExternalPaymentOption($params),
             );
@@ -418,7 +418,7 @@ class Cardinity extends PaymentModule
             );
         }
 
-        
+
 
         return $payment_options;
     }
@@ -431,7 +431,7 @@ class Cardinity extends PaymentModule
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
         $attributes = [
-            "amount" => number_format( $params['cart']->getOrderTotal() , 2),
+            "amount" => number_format($params['cart']->getOrderTotal(), 2),
             "currency" => $currency->iso_code,
             "country" => $country->iso_code,
             "order_id" => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
@@ -442,7 +442,7 @@ class Cardinity extends PaymentModule
         ksort($attributes);
 
         $message = '';
-        foreach($attributes as $key => $value) {
+        foreach ($attributes as $key => $value) {
             $message .= $key.$value;
         }
 
@@ -509,11 +509,6 @@ class Cardinity extends PaymentModule
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'));
         return $embeddedOption;
     }
-
-    /*protected function generateForm()
-    {
-        
-    }*/
 
     public function hookPaymentReturn($params)
     {

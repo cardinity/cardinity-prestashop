@@ -16,15 +16,20 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
         ksort($_POST);
 
         foreach ($_POST as $key => $value) {
-            if ($key == 'signature') continue;
+            if ($key == 'signature') {
+               continue;
+            }
             $message .= $key . $value;
         }
 
         $signature = hash_hmac('sha256', $message, Configuration::get('CARDINITY_PROJECT_SECRET'));
-        $cart_id = $_POST['order_id'];
+        $cart_id = Tools::getValue('order_id');//$_POST['order_id'];
         $cart = new Cart($cart_id);
         $customer = new Customer($cart->id_customer);
-        if ($signature == $_POST['signature'] && $_POST['status'] == 'approved') {
+        $postSignature = Tools::getValue('signature');//$_POST['signature'];
+        $postStatus = Tools::getValue('status');//$_POST['status'];
+        
+        if ($signature == $postSignature && $postStatus == 'approved') {
             // if everything is a success, mark the order as paid and redirect the client to a success page
             $this->module->validateOrder(
                 $cart_id,
@@ -38,7 +43,7 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
                 $customer->secure_key
             );
 
-            
+
             Tools::redirect(
                 'index.php?controller=order-confirmation&id_cart=' . $cart_id .
                     '&id_module=' . $this->module->id .
