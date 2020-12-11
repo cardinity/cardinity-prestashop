@@ -85,8 +85,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                 $response = $this->module->finalizePayment($threeDSSessionData, $data);
 
                 PrestaShopLogger::addLog("3ds v2 callback",1);
-                PrestaShopLogger::addLog(print_r($response, true) , 1);
-
+                
                 if ($response->status == 'approved') {
                     $this->module->approveOrderPayment($order);
 

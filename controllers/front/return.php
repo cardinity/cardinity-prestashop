@@ -37,6 +37,8 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
                 false,
                 $customer->secure_key
             );
+
+            
             Tools::redirect(
                 'index.php?controller=order-confirmation&id_cart=' . $cart_id .
                     '&id_module=' . $this->module->id .
