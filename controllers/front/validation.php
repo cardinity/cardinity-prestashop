@@ -48,7 +48,18 @@ class CardinityValidationModuleFrontController extends ModuleFrontController
         $currency = Context::getContext()->currency;
         $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
 
-        $this->module->validateOrder($cart->id, Configuration::get('CARDINITY_PENDING'), $total, $this->module->displayName, null, null, $currency->id);
+
+        $this->module->validateOrder(
+            $cart->id,
+            Configuration::get('CARDINITY_PENDING'),
+            $total,
+            $this->module->displayName,
+            null,
+            array(),
+            $currency->id,
+            false,
+            $cart->secure_key
+        );
 
         $order_id = $this->module->currentOrder;
 

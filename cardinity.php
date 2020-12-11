@@ -8,10 +8,10 @@
  * @link      https://cardinity.com
  */
 
+use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+
 include_once(_PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthStore.php');
 include_once(_PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthRequester.php');
-
-use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -29,7 +29,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->version = '4.0.1';
+        $this->version = '4.0.2';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -345,6 +345,7 @@ class Cardinity extends PaymentModule
     {
         $state = $order->getCurrentState();
 
+
         if ($order->id
             && $order->module == $this->name
             && $this->context->cookie->id_customer == $order->id_customer
@@ -353,6 +354,9 @@ class Cardinity extends PaymentModule
         ) {
             return true;
         }
+
+        PrestaShopLogger::addLog("Attempt Validating Order Payment : id = $order->id, customer on cookie = ".$this->context->cookie->id_customer.", customer on order =  $order->id_customer ", 1, $state, null, null, true);
+        PrestaShopLogger::addLog("Failed Validating Order Payment : ".print_r($order, true), 4, $state, null, null, true);
 
         return false;
     }
@@ -404,7 +408,7 @@ class Cardinity extends PaymentModule
             'this_path_ssl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
                 . htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8') . __PS_BASE_URI__ . 'modules/' . $this->name . '/'
         ));
-        if(Configuration::get('CARDINITY_EXTERNAL') == 1){
+        if (Configuration::get('CARDINITY_EXTERNAL') == 1) {
             $payment_options = array(
                 $this->getExternalPaymentOption($params),
             );
@@ -414,7 +418,7 @@ class Cardinity extends PaymentModule
             );
         }
 
-        
+
 
         return $payment_options;
     }
@@ -427,7 +431,7 @@ class Cardinity extends PaymentModule
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
         $attributes = [
-            "amount" => $params['cart']->getOrderTotal(),
+            "amount" => number_format($params['cart']->getOrderTotal(), 2),
             "currency" => $currency->iso_code,
             "country" => $country->iso_code,
             "order_id" => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
@@ -438,7 +442,7 @@ class Cardinity extends PaymentModule
         ksort($attributes);
 
         $message = '';
-        foreach($attributes as $key => $value) {
+        foreach ($attributes as $key => $value) {
             $message .= $key.$value;
         }
 
@@ -505,11 +509,6 @@ class Cardinity extends PaymentModule
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'));
         return $embeddedOption;
     }
-
-    /*protected function generateForm()
-    {
-        
-    }*/
 
     public function hookPaymentReturn($params)
     {
