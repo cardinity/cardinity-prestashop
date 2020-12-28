@@ -347,7 +347,7 @@ class Cardinity extends PaymentModule {
 		else
 			$current_state = $order->current_state;
 
-		Logger::addLog("VALIDATING PAYMENT: id = $order->id, valid = $order->valid,  crrent state = $current_state, ", 1, $response->status, null, null, true);
+		//Logger::addLog("VALIDATING PAYMENT: id = $order->id, valid = $order->valid,  crrent state = $current_state, ", 1, $response->status, null, null, true);
 
 		if ($order->id
 			&& $order->module == $this->name
