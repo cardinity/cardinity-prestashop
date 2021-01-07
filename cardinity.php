@@ -281,12 +281,6 @@ class Cardinity extends PaymentModule
                         'label' => $this->l('Project Secret'),
                         'name' => 'project_secret',
                         'required' => false
-                    ),
-                     array(
-                        'type' => 'text',
-                        'label' => $this->l('Project Secret'),
-                        'name' => 'project_secret',
-                        'required' => false
                     )
                 ),
                 'submit' => array(
