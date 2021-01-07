@@ -54,7 +54,16 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                 $response = $this->module->finalizePayment($payment_id, $data);
 
                 if ($response->status == 'approved') {
-                    $this->module->approveOrderPayment($order);
+
+                    //104 :: b54b19a2-5702-4945-9799-5253f7ce0b81 :: none :: 50.00 EUR :: approved
+                    $transactionData = array(
+                        $order->id,
+                        $payment_id,
+                        'v1',
+                        $response->amount ." ". $currency,
+                        'approved'
+                    );
+                    $this->module->approveOrderPayment($order, $transactionData);
 
                     Tools::redirect(
                         'index.php?controller=order-confirmation&id_cart=' . $cart->id .
@@ -80,7 +89,16 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                 PrestaShopLogger::addLog("3ds v2 callback", 1);
 
                 if ($response->status == 'approved') {
-                    $this->module->approveOrderPayment($order);
+
+                    $transactionData = array(
+                        $order->id,
+                        $response->id,
+                        'v2',
+                        $response->amount ." ". $response->currency,
+                        'approved'
+                    );
+
+                    $this->module->approveOrderPayment($order, $transactionData);
 
                     Tools::redirect(
                         'index.php?controller=order-confirmation&id_cart=' . $cart->id .
@@ -155,7 +173,16 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                 ));
 
                 if ($response->status == 'approved') {
-                    $this->module->approveOrderPayment($order);
+
+                    $transactionData = array(
+                        $order->id,
+                        $response->id,
+                        'none',
+                        $response->amount ." ". $response->currency,
+                        'approved'
+                    );
+
+                    $this->module->approveOrderPayment($order, $transactionData) ;
 
                     PrestaShopLogger::addLog('Cardinity: Response status approved', 1, null, null, null, true);
                     Tools::redirect(
