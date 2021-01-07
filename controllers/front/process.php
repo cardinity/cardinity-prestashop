@@ -60,7 +60,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                         $order->id,
                         $payment_id,
                         'v1',
-                        $response->amount ." ". $currency,
+                        $response->amount ." ". $response->currency,
                         'approved'
                     );
                     $this->module->approveOrderPayment($order, $transactionData);
