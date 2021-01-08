@@ -29,7 +29,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->version = '4.0.2';
+        $this->version = '4.0.3';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -156,6 +156,34 @@ class Cardinity extends PaymentModule
     /* Admin module */
     public function getContent()
     {
+        $logMessage = '';
+
+        if(isset($_POST['subaction']) && $_POST['subaction']== 'downloadlog'){            
+
+            $currentFilename = "transactions-". $_POST['year'] .'-'. $_POST['month'];
+            
+            $currentDir = dirname(__FILE__);
+            $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'var'.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR . $currentFilename .'.log';
+            
+
+			$downloadFileName = 'crd-'.$currentFilename.'-'.time().'.log';
+
+			if (file_exists($transactionFile)) {
+				header('Content-Description: File Transfer');
+				header('Content-Type: application/octet-stream');
+				header('Content-Disposition: attachment; filename="'.basename($downloadFileName).'"');
+				header('Expires: 0');
+				header('Cache-Control: must-revalidate');
+				header('Pragma: public');
+				header('Content-Length: ' . filesize($transactionFile));
+                readfile($transactionFile);
+                
+				//exit;
+			}else{
+                $logMessage = "<div class='alert alert-info'>No transaction log found for - ".$_POST['year'] .' / '. $_POST['month']." .</div>";
+            }
+        }
+
         $html = '';
 
         if ($this->validatePostRequest()) {
@@ -167,6 +195,8 @@ class Cardinity extends PaymentModule
         $html .= $this->displayInfos();
         $html .= $this->renderForm();
 
+        $html .= $this->displayTransactionHistory($logMessage);
+
         return $html;
     }
 
@@ -174,6 +204,29 @@ class Cardinity extends PaymentModule
     private function displayInfos()
     {
         return $this->display(__FILE__, 'views/templates/admin/infos.tpl');
+    }
+
+    private function displayTransactionHistory($logMessage){
+
+        $thisYear = (int) Date("Y");
+        $years = '';
+        for($i = $thisYear; $i >= $thisYear -10 ; $i--){
+            $years .= "<option>$i</option>";
+        }
+        $months = '';
+        for($i = 1; $i <= 12 ; $i++){
+            $months .= "<option>$i</option>";
+        }
+        
+        $this->context->smarty->assign(
+            array(
+                'allYearOptions' => $years,
+                'allMonthOptions' => $months,
+                'message' => $logMessage
+            )
+        );
+        
+        return $this->display(__FILE__, 'views/templates/admin/transactions.tpl');
     }
 
     /* Renders admin module configuration form */
@@ -381,7 +434,7 @@ class Cardinity extends PaymentModule
     }
 
     /* Called then respons status == 'approved' */
-    public function approveOrderPayment($order)
+    public function approveOrderPayment($order, $transactionLogData = false)
     {
         $history = new OrderHistory();
         $history->id_order = $order->id;
@@ -389,6 +442,34 @@ class Cardinity extends PaymentModule
         $history->addWithemail(true, array(
             'order_name' => $order->id,
         ));
+
+        if($transactionLogData){
+            $this->addTransactionHistory($transactionLogData);
+        }
+    }
+
+    public function addTransactionHistory($data){
+
+        $currentFilename = "transactions-".date("Y-n").'.log';
+       
+
+        $currentDir = dirname(__FILE__);
+
+        $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'var'.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.$currentFilename;
+        //$transactionFile = WP_CONTENT_DIR.'/uploads/wc-logs/cardinity-transactions.log';
+
+        $message = "";
+        if (!file_exists($transactionFile)) {
+         $message = "OrderID :: PaymentID :: 3dsVersion :: Amount :: Status\n";
+        }       
+        $message .= implode(" :: ",$data);
+        
+        file_put_contents($transactionFile, $message."\n", FILE_APPEND);
+
+        /*$fp = fopen($transactionFile, 'a');//opens file in append mode  
+        fwrite($fp, ' this is additional text ');  
+        fwrite($fp, 'appending data');  
+        fclose($fp);  			*/
     }
 
     /* Checkout payment gateway */

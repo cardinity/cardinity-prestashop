@@ -43,6 +43,16 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
                 $customer->secure_key
             );
 
+            $transactionData = array(
+                Tools::getValue('order_id'),
+                Tools::getValue('id'),
+                'unknown(external)',
+                Tools::getValue('amount') ." ". Tools::getValue('currency'),
+                Tools::getValue('status')
+            );
+
+            $this->module->addTransactionHistory($transactionData);
+
 
             Tools::redirect(
                 'index.php?controller=order-confirmation&id_cart=' . $cart_id .
