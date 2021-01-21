@@ -60,7 +60,6 @@ class CardinityProcessModuleFrontController extends ModuleFrontController {
 					'order_id'           => $order_id_string,
 					'country'            => $country->iso_code,
 					'payment_method'     => 'card',
-					//'description'        => '3d-pass',
 					'payment_instrument' => array(
 						'pan'       => strip_tags(str_replace(' ', '', Tools::getValue('card_pan'))),
 						'exp_year'  => (int)Tools::getValue('expiration_year'),
@@ -85,20 +84,24 @@ class CardinityProcessModuleFrontController extends ModuleFrontController {
 
 				if ($response->status == 'approved')
 				{
-					$this->module->approveOrderPayment($this->order);
+					$transactionData = array(
+                        $this->order->id,
+                        $response->id,
+                        'none',
+                        $response->amount ." ". $response->currency,
+                        'approved'
+					);
+					
+					$this->module->approveOrderPayment($this->order, $transactionData);
 
 					Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id
 						.'&id_module='.$this->module->id.'&id_order='.$this->order->id.'&key='.$customer->secure_key);
 				} elseif ($response->status == 'pending')
 				{
 
-
-
 					$this->module->savePayment($response, $this->order->id);
 
-
 					if($response->threeds2_data){
-
 
 						$acs_url = $response->threeds2_data->acs_url;
 						$creq = $response->threeds2_data->creq;

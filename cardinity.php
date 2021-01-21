@@ -13,7 +13,7 @@ class Cardinity extends PaymentModule {
 	{
 		$this->name = 'cardinity';
 		$this->tab = 'payments_gateways';
-		$this->version = '1.4.2';
+		$this->version = '1.4.3';
 		$this->author = 'Cardinity';
 		$this->module_key = '132b5bda972a4f28b26d559db88e26ba';
 
@@ -127,6 +127,35 @@ class Cardinity extends PaymentModule {
 
 	public function getContent()
 	{
+
+		$logMessage = '';
+
+        if(isset($_POST['subaction']) && $_POST['subaction']== 'downloadlog'){            
+
+            $currentFilename = "transactions-". $_POST['year'] .'-'. $_POST['month'];
+            
+            $currentDir = dirname(__FILE__);
+            $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'log'.DIRECTORY_SEPARATOR . $currentFilename .'.log';            
+
+			$downloadFileName = 'crd-'.$currentFilename.'-'.time().'.log';
+
+			if (file_exists($transactionFile)) {
+				header('Content-Description: File Transfer');
+				header('Content-Type: application/octet-stream');
+				header('Content-Disposition: attachment; filename="'.basename($downloadFileName).'"');
+				header('Expires: 0');
+				header('Cache-Control: must-revalidate');
+				header('Pragma: public');
+				header('Content-Length: ' . filesize($transactionFile));
+                readfile($transactionFile);
+                
+				//exit;
+			}else{
+                $logMessage = "<div class='alert alert-info'>No transaction log found for - ".$_POST['year'] .' / '. $_POST['month']." .</div>";
+            }
+		}
+		
+
 		$html = '';
 
 		if ($this->validatePostRequest())
@@ -141,6 +170,9 @@ class Cardinity extends PaymentModule {
 		else
 			$html .= $this->renderForm();
 
+
+		$html .= $this->displayTransactionHistory($logMessage);
+
 		return $html;
 	}
 
@@ -148,6 +180,29 @@ class Cardinity extends PaymentModule {
 	{
 		return $this->display(__FILE__, 'views/templates/admin/header.tpl');
 	}
+
+	private function displayTransactionHistory($logMessage){
+
+        $thisYear = (int) Date("Y");
+        $years = '';
+        for($i = $thisYear; $i >= $thisYear -10 ; $i--){
+            $years .= "<option>$i</option>";
+        }
+        $months = '';
+        for($i = 1; $i <= 12 ; $i++){
+            $months .= "<option>$i</option>";
+        }
+        
+        $this->context->smarty->assign(
+            array(
+                'allYearOptions' => $years,
+                'allMonthOptions' => $months,
+                'message' => $logMessage
+            )
+        );
+        
+        return $this->display(__FILE__, 'views/templates/admin/transactions.tpl');
+    }
 
 	public function renderForm()
 	{
@@ -371,10 +426,6 @@ class Cardinity extends PaymentModule {
             VALUES ('.$id_shop.', "'.$response->id.'", '.$order_id.')
 		');
 
-		Logger::addLog("SAVING PAYMENT :".'
-			INSERT INTO '._DB_PREFIX_.'cardinity (id_shop, id_payment, id_order)
-			VALUES ('.$id_shop.', "'.$response->id.'", '.$order_id.')
-		', 1, $response->status, null, null, true);
 	}
 
 	public function getPaymentOrder($payment_id)
@@ -382,7 +433,7 @@ class Cardinity extends PaymentModule {
 		return Db::getInstance()->getRow('SELECT id_order FROM '._DB_PREFIX_.'cardinity WHERE id_payment = "'.$payment_id.'"');
 	}
 
-	public function approveOrderPayment($order)
+	public function approveOrderPayment($order, $transactionLogData = false)
 	{
 		$history = new OrderHistory();
 		$history->id_order = $order->id;
@@ -390,7 +441,32 @@ class Cardinity extends PaymentModule {
 		$history->addWithemail(true, array(
 			'order_name' => $order->id,
 		));
+
+		
+        if($transactionLogData){
+            $this->addTransactionHistory($transactionLogData);
+        }
 	}
+
+	public function addTransactionHistory($data){
+
+        $currentFilename = "transactions-".date("Y-n").'.log';
+       
+
+        $currentDir = dirname(__FILE__);
+
+        $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'log'.DIRECTORY_SEPARATOR.$currentFilename;
+        //$transactionFile = WP_CONTENT_DIR.'/uploads/wc-logs/cardinity-transactions.log';
+
+        $message = "";
+        if (!file_exists($transactionFile)) {
+         $message = "OrderID :: PaymentID :: 3dsVersion :: Amount :: Status\n";
+        }       
+        $message .= implode(" :: ",$data);
+        
+        file_put_contents($transactionFile, $message."\n", FILE_APPEND);
+
+    }
 
 	public function hookPaymentReturn($params)
 	{
@@ -494,7 +570,15 @@ class Cardinity extends PaymentModule {
 
 				if ($response->status == 'approved')
 				{
-					$this->approveOrderPayment($order);
+					$transactionData = array(
+						$order->id,
+						$response->id,
+						'none',
+						$response->amount ." ". $response->currency,
+						'approved'
+					);
+
+					$this->approveOrderPayment($order, $transactionData);
 
 					Tools::redirectLink(__PS_BASE_URI__.'order-confirmation.php?id_cart='.$cart->id
 						.'&id_module='.$this->id.'&id_order='.$this->currentOrder.'&key='.$customer->secure_key);
@@ -630,7 +714,15 @@ class Cardinity extends PaymentModule {
 
 			if ($response->status == 'approved')
 			{
-				$this->approveOrderPayment($order);
+				$transactionData = array(
+					$order->id,
+					$response->id,
+					'v1',
+					$response->amount ." ". $response->currency,
+					'approved'
+				);
+
+				$this->approveOrderPayment($order, $transactionData);
 
 				Tools::redirectLink(__PS_BASE_URI__.'order-confirmation.php?id_cart='.$cart->id.'&id_module='
 					.$this->id.'&id_order='.$this->currentOrder.'&key='.$customer->secure_key);
