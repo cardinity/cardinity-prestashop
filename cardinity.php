@@ -371,10 +371,6 @@ class Cardinity extends PaymentModule {
             VALUES ('.$id_shop.', "'.$response->id.'", '.$order_id.')
 		');
 
-		Logger::addLog("SAVING PAYMENT :".'
-			INSERT INTO '._DB_PREFIX_.'cardinity (id_shop, id_payment, id_order)
-			VALUES ('.$id_shop.', "'.$response->id.'", '.$order_id.')
-		', 1, $response->status, null, null, true);
 	}
 
 	public function getPaymentOrder($payment_id)
