@@ -10,8 +10,7 @@ class CardinityCallbackModuleFrontController extends ModuleFrontController {
 	public function postProcess()
 	{
 
-
-
+		$threeDsVersion = 'none';
 		$callbackParams = Tools::getAllValues();
 
 		if(isset($callbackParams['MD'])){
@@ -20,6 +19,7 @@ class CardinityCallbackModuleFrontController extends ModuleFrontController {
 			$payment_id = Tools::getValue('MD');
 			$pares = Tools::getValue('PaRes');
 			$data = array('authorize_data' => $pares);
+			$threeDsVersion = 'v1';
 
 		}else{
 
@@ -27,6 +27,7 @@ class CardinityCallbackModuleFrontController extends ModuleFrontController {
 			$payment_id = Tools::getValue('threeDSSessionData');
 			$cres = Tools::getValue('cres');
 			$data = array('cres' => $cres);
+			$threeDsVersion = 'v2';
 		}
 
 		$order = $this->module->getPaymentOrder($payment_id);
@@ -42,7 +43,15 @@ class CardinityCallbackModuleFrontController extends ModuleFrontController {
 
 			if ($response->status == 'approved')
 			{
-				$this->module->approveOrderPayment($order);
+				$transactionData = array(
+					$order->id,
+					$response->id,
+					$threeDsVersion,
+					$response->amount ." ". $response->currency,
+					'approved'
+				);
+
+				$this->module->approveOrderPayment($order,$transactionData);
 
 				Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id
 					.'&id_module='.$this->module->id.'&id_order='.$order->id.'&key='.$customer->secure_key);
