@@ -1,64 +1,113 @@
-# README #
+# Cardinity Payment Gateway for Prestashop
 
-This module will help you to activate Cardinity credit card payments on your shop.
+### Table of Contents  
+[<b>Requirements</b>](#Requirements)<br>
+[<b>How to install?</b>](#How-to-install)  
+       [Method no. 1 (recommended)](#method-no-1-recommended)  
+       [Method no. 2](#method-no-2)   
+ [<b>Downloads →</b>](#downloads)<br>
+ [<b>Having problems?</b>](#having-problems)<br>
+ [<b>About us →</b>](#aboutus)<br>     
+<a name="headers"/>  
 
-### Information for Addons Market ###
+## Installation
 
-**Category:** Payments & Gateways
+### Requirements
+• Cardinity account  
 
-**Countries:** Lithuania, United Kingdom, Germany, France, Italy
+First, to avoid any disturbances during installation process, you must change the permissions of ```/modules/``` folder in your Prestashop main directory. 
+<br><br>
+For <b>Windows:</b> 
 
-**New categories:** Payment by card, Subscriptions
+1) Open your Prestashop main directory.
+2) Right click ```/modules/``` folder and click ```Properties```.
+3) Go to "Security" tab and click ```Edit...```
+4) Make sure that the user or group under which you operate has "Read & execute" and "Write" checked.
 
-**NAME OF YOUR MODULE**
+For <b>Linux</b>:
+Set permissions on folder ```/modules/``` to 777. You can do so by typing the following command to LINUX terminal: 
+```
+chmod -R 777 "path to your Prestashop /modules/ folder (for example /data/Prestashop/modules).
+```
+After the installation, do not forget to change back the permissions of ```/modules/``` folder.  
 
-Cardinity Credit Card Processing Module
+### How to install?
 
-**SHORT DESCRIPTION**
+<b>Click below to watch the tutorial:</b>  
+  
+[![how to integrate cardinity into prestashop](https://i.ytimg.com/an_webp/lwKoIbM6kj8/mqdefault_6s.webp?du=3000&sqp=CNGq84EG&rs=AOn4CLDAAPU-y8nL17wzk7pM4ojqvABpoQ)](https://www.youtube.com/watch?v=lwKoIbM6kj8)
 
-Accept direct credit and debit card payments directly in your shop. No monthly fees, no setup fees. Over 100 currencies supported. Allow your customers to easily pay by credit or debit card. Easy set-up and approval. All European merchants welcome.
+#### Method no. 1 (recommended)
+1) Go to your Prestashop admin panel.
+2) Navigate to ```Modules → Module catalog```.
+3) At the top right click ```Upload a module```, press ```Select file``` and choose the downloaded Cardinity plugin .zip file.
+4) After the installation, click ```Configure```.
+5) Enter ```Consumer Key``` and ```Consumer Secret``` which can be found in your Cardinity account.   
+<i>Note: if you plan on using the ```External checkout option```, you also need to fill in the ```Project Key``` and ```Project Secret``` fields.</i>
+6) Save the changes.
 
-**THE BENEFITS FOR MERCHANTS**
+#### Method 2
+1) Go to Prestashop main directory.
+2) Open ```Modules``` folder and create a new folder named ```Cardinity```.
+3) Extract the downloaded Cardinity Payment Module for Prestashop plugin .zip  file.
+4) Go to Prestashop admin panel, navigate to ```Modules > Module catalog".
+5) Type "Cardinity" in to the search box.
+6) Press ```Install```.
+7) After the installation, click ```Configure```.
+8) Enter ```Consumer Key``` and ```Consumer Secret``` which you can find in your Cardinity account.  
+<i>Note: if you plan on using the ```External checkout option```, you also need to fill in the ```Project Key``` and ```Project Secret``` fields.</i>
+10) Save the changes.
 
-Cardinity is the most friendly payment service. Just download this module, install it on your PrestaShop and signup for Cardinity service - and you are ready to process card payments online. Allow your customers to pay directly with their debit or credit cards on your store without having to leave your shop.
+### Downloads
+Find the latest version of this extension here: https://github.com/cardinity/cardinity-prestashop/releases
+<details show>
+  <summary>For PrestaShop 1.7.x</summary>
+  
+| Version       | Description                                         |Link        |
+| ------------- |-----------------------------------------------------|------------|
+| 4.0.3 | Added transaction log | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.3">Download</a> |
+| 4.0.2 | Bug fix on external amount; Cleanup on presta syntax; Added optional patch for FrontController in repo | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.2">Download</a> |
+| 4.0.1 | updated to use Cardinity sdk v3, 3dsv2 secured, 3dsv2 > v1 fallback | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.1">Download</a> |
+| 3.0.0 | added binary | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v3.0.0">Download</a>
+| 2.0.0 | Release | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v2.0.0">Download</a>
+</details>
 
-* Quick and easy integration - 5 minutes and you can process live transactions
-* Increased fraud protection by Verified by VISA and MasterCard Secure code technologies
-* Customers from all over the world - no matter where they are, you will be able to accept all types of card payments
-* Recurring payments made easy - for your subscription type business
+<details show>
+  <summary>For PrestaShop 1.4.x - 1.6.x</summary>
+  
+| Version       | Description                                         |Link        |
+| ------------- |-----------------------------------------------------|------------|
+| v1.4.3 | Transaction log viewable from admin | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v1.4.3">Download</a> |
+</details>
 
-**FEATURES**
 
-Simple payment process - you sign the contract with Cardinity and get all services you need. No payment gateway, no acquiring bank needed. Cardinity will take care of your business and provide you with all the essentials from one source.
+### Having problems?  
 
-* Accept direct debit and credit card payments on your website
-* We support VISA, MasterCard, Maestro, Discover, Dinners, JCB, and other major card brands
-* Over 100 currencies supported
-* More than 30 European countries supported
-* Quick and easy approval process
-* PCI-DSS Compliant payment provider for safe payments
-* E-commerce, Recurring and MOTO type payments
-* No monthly fees, no set-up fees
-* Pay only €0.25 + 1.7% per transaction
+Feel free to contact us regarding any problems that occurred during integration via info@cardinity.com. We will be more than happy to help.
 
-**INSTALLATION**
+-----
 
-Installation
+### About us
+Cardinity is a licensed payment institution, active in the European Union, registered on VISA Europe and MasterCard International associations to provide <b>e-commerce credit card processing services</b> for online merchants. We operate not only as a <u>payment gateway</u> but also as an <u>acquiring Bank</u>. With over 10 years of experience in providing reliable online payment services, we continue to grow and improve as a perfect payment service solution for your businesses. Cardinity is certified as PCI-DSS level 1 payment service provider and always assures a secure environment for transactions. We assure a safe and cost-effective, all-in-one online payment solution for e-commerce businesses and sole proprietorships.<br>
+#### Our features
+• Fast application and boarding procedure.   
+• Global payments - accept payments in major currencies with credit and debit cards from customers all around the world.   
+• Recurring billing for subscription or membership based sales.  
+• One-click payments - let your customers purchase with a single click.   
+• Mobile payments. Purchases made anywhere on any mobile device.   
+• Payment gateway and free merchant account.   
+• PCI DSS level 1 compliance and assured security with our enhanced protection measures.   
+• Simple and transparent pricing model. Only pay per transaction and receive all the features for free.
+### Get started
+<a href="https://cardinity.com/sign-up">Click here</a> to sign-up and start accepting credit and debit card payments on your website or <a href="https://cardinity.com/company/contact-us">here</a> to contact us 
 
-Follow these steps to install the module on your store:
-1. Set 777 or 0777 permissions on folder “/modules/”.
-Don’t forget to change permissions back after installation.
+___
 
-2. Login to your PrestaShop admin area and go to Modules, then click on Add a module from my computer, choose the file (.zip), and upload this module. Choose the module in section Payments and Gateways and install it.
+#### Keywords
+payment gateway, credit card payment, online payment, credit card processing, online payment gateway, cardinity for Prestashop.     
 
-Module Configuration
+  
+ [▲ back to top](#Cardinity-Payment-Gateway-for-PrestaShop)
+<!--
+**fjundzer/fjundzer** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
-To configure the module, choose Modules (on your PrestaShop admin area) then find module Cardinity under Payments and Gateways tab and click on Configure.
-
-There is only one section in module’s configuration page. You need to enter Consumer Key and Consumer Secret which you can find on your Cardinity account’s member’s area (navigate to Integration --> API Settings).
-
-**KEYWORDS**
-
-accept, card, payments, credit, processing, gateway, process, debit
-
-**DEMO BACK OFFICE:**
