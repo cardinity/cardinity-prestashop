@@ -29,7 +29,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->version = '4.0.3';
+        $this->version = '4.0.3.1';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -512,7 +512,7 @@ class Cardinity extends PaymentModule
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
         $attributes = [
-            "amount" => number_format($params['cart']->getOrderTotal(), 2),
+            "amount" => number_format($params['cart']->getOrderTotal(true, Cart::BOTH), 2),
             "currency" => $currency->iso_code,
             "country" => $country->iso_code,
             "order_id" => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
