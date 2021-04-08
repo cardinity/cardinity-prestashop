@@ -34,7 +34,7 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
             $this->module->validateOrder(
                 $cart_id,
                 Configuration::get('PS_OS_PAYMENT'),
-                $cart->getOrderTotal(),
+                $cart->getOrderTotal(true, Cart::BOTH),
                 $this->module->displayName,
                 null,
                 array(),
