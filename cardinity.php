@@ -29,7 +29,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->version = '4.0.3.1';
+        $this->version = '4.0.3.2';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -401,7 +401,7 @@ class Cardinity extends PaymentModule
 
         if ($order->id
             && $order->module == $this->name
-            && $this->context->cookie->id_customer == $order->id_customer
+            //&& $this->context->cookie->id_customer == $order->id_customer
             && !$order->valid
             && $state != (int)Configuration::get('PS_OS_CANCELED')
         ) {

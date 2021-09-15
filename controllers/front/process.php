@@ -44,7 +44,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
         if ($this->module->validateOrderPayment($order)) {
             $currency = new Currency($order->id_currency);
             $cart = new Cart($order->id_cart);
-            $customer = new Customer($cart->id_customer);
+            $customer = new Customer($order->id_customer);
 
             // If 3-D
             if (empty($order_id) && !empty($payment_id)) {
