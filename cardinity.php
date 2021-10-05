@@ -409,7 +409,7 @@ class Cardinity extends PaymentModule
         }
 
         PrestaShopLogger::addLog("Attempt Validating Order Payment : id = $order->id, customer on cookie = ".$this->context->cookie->id_customer.", customer on order =  $order->id_customer ", 1, $state, null, null, true);
-        PrestaShopLogger::addLog("Failed Validating Order Payment : ".print_r($order, true), 4, $state, null, null, true);
+        PrestaShopLogger::addLog("Failed Validating Order Payment", 1, $state, null, null, true);
 
         return false;
     }
