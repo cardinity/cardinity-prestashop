@@ -75,7 +75,7 @@
                     {/for}
                 </select>
                 /
-                <select name="expiration_year" class="expiration-year form-control" id="expirationMonth">
+                <select name="expiration_year" class="expiration-year form-control" id="expirationYear">
                     {for $year=date('Y') to date('Y', strtotime('+ 19 years'))}
                         <option value="{$year|escape:'intval'}"
                                 {if isset($input['expiration_year']) && $input['expiration_year'] == $year}selected{/if}>{$year}</option>
