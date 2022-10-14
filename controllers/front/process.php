@@ -84,15 +84,15 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                 $cres = Tools::getValue('cres');
                 $data = array('cres' => $cres);
 
-                PrestaShopLogger::addLog("3ds v2 callback", 1, null, null, null, true);
-                PrestashopLogger::addLog(json_encode($_POST), 1, null, null, null, true);
+                PrestaShopLogger::addLog("Cardinity 3ds v2 callback", 1, null, null, null, true);
+                PrestashopLogger::addLog('Cardinity '.json_encode($_POST), 1, null, null, null, true);
 
                 $response = $this->module->finalizePayment($threeDSSessionData, $data);
 
                 
                 if ($response->status == 'approved') {
 
-                    PrestaShopLogger::addLog("Payment Finalized Approved", 1, null, null, null, true);
+                    PrestaShopLogger::addLog("Cardinity Payment Finalized Approved", 1, null, null, null, true);
 
                     $transactionData = array(
                         $order->id,
@@ -110,7 +110,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                     );
                 } elseif ($response->status == 'pending') {
 
-                    PrestaShopLogger::addLog("3ds retry with v1", 1, null, null, null, true);
+                    PrestaShopLogger::addLog("Cardinity 3ds retry with v1", 1, null, null, null, true);
 
                     //3dsv2 failed with pending, retry for 3dsv1
                     $url = $response->authorization_information->url;
@@ -150,8 +150,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
 
                 //$link = new Link();
 
-
-                $response = $this->module->makePayment(array(
+                $paymentParams = array(
                     'amount' => $total,
                     'currency' => $currency->iso_code,
                     'order_id' => $order_id_string,
@@ -177,7 +176,15 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                             "time_zone" => (int) strip_tags(trim(Tools::getValue('time_zone')))
                         ],
                     ],
-                ));
+                );
+
+                
+                $logParams = $paymentParams;
+                unset($logParams['payment_instrument']);
+                PrestaShopLogger::addLog('Cardinity Creating '.json_encode($logParams), 1, null, null, null, true);                
+
+
+                $response = $this->module->makePayment($paymentParams);
 
                 if ($response->status == 'approved') {
 
