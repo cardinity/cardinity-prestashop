@@ -29,7 +29,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->version = '4.0.3.1';
+        $this->version = '4.0.5';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -401,7 +401,7 @@ class Cardinity extends PaymentModule
 
         if ($order->id
             && $order->module == $this->name
-            && $this->context->cookie->id_customer == $order->id_customer
+            //&& $this->context->cookie->id_customer == $order->id_customer
             && !$order->valid
             && $state != (int)Configuration::get('PS_OS_CANCELED')
         ) {
@@ -409,7 +409,7 @@ class Cardinity extends PaymentModule
         }
 
         PrestaShopLogger::addLog("Attempt Validating Order Payment : id = $order->id, customer on cookie = ".$this->context->cookie->id_customer.", customer on order =  $order->id_customer ", 1, $state, null, null, true);
-        PrestaShopLogger::addLog("Failed Validating Order Payment : ".print_r($order, true), 4, $state, null, null, true);
+        PrestaShopLogger::addLog("Failed Validating Order Payment", 1, $state, null, null, true);
 
         return false;
     }
@@ -575,6 +575,9 @@ class Cardinity extends PaymentModule
                        ])
                        ->setAdditionalInformation($this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/hook/payment_external.tpl'))
                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'));
+
+        PrestaShopLogger::addLog('Cardinity: External payment prep', 1, null, null, null, true);
+        PrestashopLogger::addLog('Cardinity '.json_encode($attributes), 1, null, null, null, true);
 
         return $externalOption;
     }

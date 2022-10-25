@@ -44,12 +44,15 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
         if ($this->module->validateOrderPayment($order)) {
             $currency = new Currency($order->id_currency);
             $cart = new Cart($order->id_cart);
-            $customer = new Customer($cart->id_customer);
+            $customer = new Customer($order->id_customer);
 
             // If 3-D
             if (empty($order_id) && !empty($payment_id)) {
                 $pares = Tools::getValue('PaRes');
                 $data = array('authorize_data' => $pares);
+
+                PrestaShopLogger::addLog("Cardinity 3ds v1 callback", 1, null, null, null, true);
+                PrestashopLogger::addLog('Cardinity '.json_encode($_POST), 1, null, null, null, true);
 
                 $response = $this->module->finalizePayment($payment_id, $data);
 
@@ -84,11 +87,15 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                 $cres = Tools::getValue('cres');
                 $data = array('cres' => $cres);
 
+                PrestaShopLogger::addLog("Cardinity 3ds v2 callback", 1, null, null, null, true);
+                PrestashopLogger::addLog('Cardinity '.json_encode($_POST), 1, null, null, null, true);
+
                 $response = $this->module->finalizePayment($threeDSSessionData, $data);
 
-                PrestaShopLogger::addLog("3ds v2 callback", 1);
-
+                
                 if ($response->status == 'approved') {
+
+                    PrestaShopLogger::addLog("Cardinity Payment Finalized Approved", 1, null, null, null, true);
 
                     $transactionData = array(
                         $order->id,
@@ -105,6 +112,9 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                         '&id_module=' . $this->module->id . '&id_order=' . $order->id . '&key=' . $customer->secure_key
                     );
                 } elseif ($response->status == 'pending') {
+
+                    PrestaShopLogger::addLog("Cardinity 3ds retry with v1", 1, null, null, null, true);
+
                     //3dsv2 failed with pending, retry for 3dsv1
                     $url = $response->authorization_information->url;
                     $data = $response->authorization_information->data;
@@ -143,8 +153,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
 
                 //$link = new Link();
 
-
-                $response = $this->module->makePayment(array(
+                $paymentParams = array(
                     'amount' => $total,
                     'currency' => $currency->iso_code,
                     'order_id' => $order_id_string,
@@ -170,7 +179,15 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                             "time_zone" => (int) strip_tags(trim(Tools::getValue('time_zone')))
                         ],
                     ],
-                ));
+                );
+
+                
+                $logParams = $paymentParams;
+                unset($logParams['payment_instrument']);
+                PrestaShopLogger::addLog('Cardinity Creating '.json_encode($logParams), 1, null, null, null, true);                
+
+
+                $response = $this->module->makePayment($paymentParams);
 
                 if ($response->status == 'approved') {
 
@@ -190,6 +207,9 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                         '&id_module=' . $this->module->id . '&id_order=' . $order->id . '&key=' . $customer->secure_key
                     );
                 } elseif ($response->status == 'pending') {
+
+                    PrestaShopLogger::addLog('Cardinity: response: '.json_encode($response), 1, null, null, null, true);
+
                     if (property_exists($response, 'threeds2_data')) {
                         //3ds v2
                         $this->module->savePayment($response, $order->id);

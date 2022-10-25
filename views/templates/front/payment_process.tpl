@@ -144,12 +144,12 @@
                     </div>
                 </div>
 
-                <input type='hidden' id='screen_width' name='screen_width' value='' />                
-                <input type='hidden' id='screen_height' name='screen_height' value='' />                
-                <input type='hidden' id='browser_language' name='browser_language' value='' />                
-                <input type='hidden' id='challenge_window_size' name='challenge_window_size' value='' />
-                <input type='hidden' id='color_depth' name='color_depth' value='' />                
-                <input type='hidden' id='time_zone' name='time_zone' value='' />
+                <input type='hidden' id='screen_width' name='screen_width' value='800' />                
+                <input type='hidden' id='screen_height' name='screen_height' value='600' />                
+                <input type='hidden' id='browser_language' name='browser_language' value='en-US' />                
+                <input type='hidden' id='challenge_window_size' name='challenge_window_size' value='full-screen' />
+                <input type='hidden' id='color_depth' name='color_depth' value='24' />                
+                <input type='hidden' id='time_zone' name='time_zone' value='-360' />
 
             </form>
         </div>
