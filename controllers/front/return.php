@@ -12,6 +12,9 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
+        PrestaShopLogger::addLog('Cardinity: External payment return', 1, null, null, null, true);
+        PrestashopLogger::addLog('Cardinity '.json_encode($_POST), 1, null, null, null, true);
+
         $message = '';
         ksort($_POST);
 
