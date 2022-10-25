@@ -51,6 +51,9 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                 $pares = Tools::getValue('PaRes');
                 $data = array('authorize_data' => $pares);
 
+                PrestaShopLogger::addLog("Cardinity 3ds v1 callback", 1, null, null, null, true);
+                PrestashopLogger::addLog('Cardinity '.json_encode($_POST), 1, null, null, null, true);
+
                 $response = $this->module->finalizePayment($payment_id, $data);
 
                 if ($response->status == 'approved') {
