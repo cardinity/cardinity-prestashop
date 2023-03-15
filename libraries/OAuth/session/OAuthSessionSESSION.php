@@ -38,33 +38,31 @@
 
 require_once dirname(__FILE__).'/OAuthSessionAbstract.class.php';
 
-class OAuthSessionSESSION extends OAuthSessionAbstract {
+class OAuthSessionSESSION extends OAuthSessionAbstract
+{
+    public function __construct($options = array())
+    {
+    }
 
-	public function __construct($options = array())
-	{
-	}
+    /**
+     * Gets a variable value
+     *
+     * @param string $key
+     * @return The value or null if not set.
+     */
+    public function get($key)
+    {
+        return @$_SESSION[$key];
+    }
 
-	/**
-	 * Gets a variable value
-	 *
-	 * @param string $key
-	 * @return The value or null if not set.
-	 */
-	public function get($key)
-	{
-		return @$_SESSION[$key];
-	}
-
-	/**
-	 * Sets a variable value
-	 *
-	 * @param string $key The key
-	 * @param any $data The data
-	 */
-	public function set($key, $data)
-	{
-		$_SESSION[$key] = $data;
-	}
+    /**
+     * Sets a variable value
+     *
+     * @param string $key The key
+     * @param any $data The data
+     */
+    public function set($key, $data)
+    {
+        $_SESSION[$key] = $data;
+    }
 }
-
-?>

@@ -19,7 +19,6 @@ if (!defined('_PS_VERSION_')) {
 
 class Cardinity extends PaymentModule
 {
-
     public $consumer_key;
     public $consumer_secret;
     public $supported_currencies = array('EUR', 'USD', 'GBP');
@@ -158,28 +157,27 @@ class Cardinity extends PaymentModule
     {
         $logMessage = '';
 
-        if(Tools::getValue('subaction', false) == 'downloadlog'){            
-
+        if (Tools::getValue('subaction', false) == 'downloadlog') {
             $currentFilename = "transactions-". Tools::getValue('year') .'-'. Tools::getValue('month');
-            
+
             $currentDir = dirname(__FILE__);
             $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'var'.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR . $currentFilename .'.log';
-            
 
-			$downloadFileName = 'crd-'.$currentFilename.'-'.time().'.log';
 
-			if (file_exists($transactionFile)) {
-				header('Content-Description: File Transfer');
-				header('Content-Type: application/octet-stream');
-				header('Content-Disposition: attachment; filename="'.basename($downloadFileName).'"');
-				header('Expires: 0');
-				header('Cache-Control: must-revalidate');
-				header('Pragma: public');
-				header('Content-Length: ' . filesize($transactionFile));
+            $downloadFileName = 'crd-'.$currentFilename.'-'.time().'.log';
+
+            if (file_exists($transactionFile)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'.basename($downloadFileName).'"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($transactionFile));
                 readfile($transactionFile);
-                
-				//exit;
-			}else{
+
+            //exit;
+            } else {
                 $logMessage = "<div class='alert alert-info'>No transaction log found for - ".Tools::getValue('yesar') .' / '. Tools::getValue('month')." .</div>";
             }
         }
@@ -206,18 +204,18 @@ class Cardinity extends PaymentModule
         return $this->display(__FILE__, 'views/templates/admin/infos.tpl');
     }
 
-    private function displayTransactionHistory($logMessage){
-
+    private function displayTransactionHistory($logMessage)
+    {
         $thisYear = (int) Date("Y");
         $years = '';
-        for($i = $thisYear; $i >= $thisYear -10 ; $i--){
+        for ($i = $thisYear; $i >= $thisYear -10 ; $i--) {
             $years .= "<option>$i</option>";
         }
         $months = '';
-        for($i = 1; $i <= 12 ; $i++){
+        for ($i = 1; $i <= 12 ; $i++) {
             $months .= "<option>$i</option>";
         }
-        
+
         $this->context->smarty->assign(
             array(
                 'allYearOptions' => $years,
@@ -225,7 +223,7 @@ class Cardinity extends PaymentModule
                 'message' => $logMessage
             )
         );
-        
+
         return $this->display(__FILE__, 'views/templates/admin/transactions.tpl');
     }
 
@@ -443,15 +441,15 @@ class Cardinity extends PaymentModule
             'order_name' => $order->id,
         ));
 
-        if($transactionLogData){
+        if ($transactionLogData) {
             $this->addTransactionHistory($transactionLogData);
         }
     }
 
-    public function addTransactionHistory($data){
-
+    public function addTransactionHistory($data)
+    {
         $currentFilename = "transactions-".date("Y-n").'.log';
-       
+
 
         $currentDir = dirname(__FILE__);
 
@@ -460,15 +458,15 @@ class Cardinity extends PaymentModule
 
         $message = "";
         if (!file_exists($transactionFile)) {
-         $message = "OrderID :: PaymentID :: 3dsVersion :: Amount :: Status\n";
-        }       
-        $message .= implode(" :: ",$data);
-        
+            $message = "OrderID :: PaymentID :: 3dsVersion :: Amount :: Status\n";
+        }
+        $message .= implode(" :: ", $data);
+
         file_put_contents($transactionFile, $message."\n", FILE_APPEND);
 
-        /*$fp = fopen($transactionFile, 'a');//opens file in append mode  
-        fwrite($fp, ' this is additional text ');  
-        fwrite($fp, 'appending data');  
+        /*$fp = fopen($transactionFile, 'a');//opens file in append mode
+        fwrite($fp, ' this is additional text ');
+        fwrite($fp, 'appending data');
         fclose($fp);  			*/
     }
 

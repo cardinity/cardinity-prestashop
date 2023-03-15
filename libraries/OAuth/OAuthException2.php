@@ -41,17 +41,14 @@
 
 require_once dirname(__FILE__).'/OAuthRequestLogger.php';
 
-class OAuthException2 extends Exception {
-
-	function __construct($message)
-	{
-		Exception::__construct($message);
-		OAuthRequestLogger::addNote('OAuthException2: '.$message);
-	}
-
+class OAuthException2 extends Exception
+{
+    public function __construct($message)
+    {
+        Exception::__construct($message);
+        OAuthRequestLogger::addNote('OAuthException2: '.$message);
+    }
 }
 
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */
-
-?>

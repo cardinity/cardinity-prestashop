@@ -39,202 +39,198 @@
 
 require_once dirname(__FILE__).'/OAuthStoreAbstract.class.php';
 
-class OAuthStore2Leg extends OAuthStoreAbstract {
+class OAuthStore2Leg extends OAuthStoreAbstract
+{
+    protected $consumer_key;
+    protected $consumer_secret;
+    protected $signature_method = array('HMAC-SHA1');
+    protected $token_type       = false;
 
-	protected $consumer_key;
-	protected $consumer_secret;
-	protected $signature_method = array('HMAC-SHA1');
-	protected $token_type       = false;
+    /*
+     * Takes two options: consumer_key and consumer_secret
+     */
+    public function __construct($options = array())
+    {
+        if (isset($options['consumer_key']) && isset($options['consumer_secret'])) {
+            $this->consumer_key = $options['consumer_key'];
+            $this->consumer_secret = $options['consumer_secret'];
+        } else {
+            throw new OAuthException2("OAuthStore2Leg needs consumer_token and consumer_secret");
+        }
+    }
 
-	/*
-	 * Takes two options: consumer_key and consumer_secret
-	 */
-	public function __construct($options = array())
-	{
-		if (isset($options['consumer_key']) && isset($options['consumer_secret']))
-		{
-			$this->consumer_key = $options['consumer_key'];
-			$this->consumer_secret = $options['consumer_secret'];
-		} else
-		{
-			throw new OAuthException2("OAuthStore2Leg needs consumer_token and consumer_secret");
-		}
-	}
+    public function getSecretsForVerify($consumer_key, $token, $token_type = 'access')
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getSecretsForVerify($consumer_key, $token, $token_type = 'access')
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getSecretsForSignature($uri, $user_id)
+    {
+        return array(
+            'consumer_key'      => $this->consumer_key,
+            'consumer_secret'   => $this->consumer_secret,
+            'signature_methods' => $this->signature_method,
+            'token'             => $this->token_type
+        );
+    }
 
-	public function getSecretsForSignature($uri, $user_id)
-	{
-		return array(
-			'consumer_key'      => $this->consumer_key,
-			'consumer_secret'   => $this->consumer_secret,
-			'signature_methods' => $this->signature_method,
-			'token'             => $this->token_type
-		);
-	}
+    public function getServerTokenSecrets($consumer_key, $token, $token_type, $user_id, $name = '')
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getServerTokenSecrets($consumer_key, $token, $token_type, $user_id, $name = '')
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function addServerToken($consumer_key, $token_type, $token, $token_secret, $user_id, $options = array())
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function addServerToken($consumer_key, $token_type, $token, $token_secret, $user_id, $options = array())
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function deleteServer($consumer_key, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function deleteServer($consumer_key, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getServer($consumer_key, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getServer($consumer_key, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getServerForUri($uri, $user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getServerForUri($uri, $user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function listServerTokens($user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function listServerTokens($user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function countServerTokens($consumer_key)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function countServerTokens($consumer_key)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getServerToken($consumer_key, $token, $user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getServerToken($consumer_key, $token, $user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function deleteServerToken($consumer_key, $token, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function deleteServerToken($consumer_key, $token, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function setServerTokenTtl($consumer_key, $token, $token_ttl)
+    {
+        //This method just needs to exist. It doesn't have to do anything!
+    }
 
-	public function setServerTokenTtl($consumer_key, $token, $token_ttl)
-	{
-		//This method just needs to exist. It doesn't have to do anything!
-	}
+    public function listServers($q = '', $user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function listServers($q = '', $user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function updateServer($server, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function updateServer($server, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function updateConsumer($consumer, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function updateConsumer($consumer, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function deleteConsumer($consumer_key, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function deleteConsumer($consumer_key, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getConsumer($consumer_key, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getConsumer($consumer_key, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getConsumerStatic()
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getConsumerStatic()
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function addConsumerRequestToken($consumer_key, $options = array())
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function addConsumerRequestToken($consumer_key, $options = array())
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getConsumerRequestToken($token)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getConsumerRequestToken($token)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function deleteConsumerRequestToken($token)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function deleteConsumerRequestToken($token)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function authorizeConsumerRequestToken($token, $user_id, $referrer_host = '')
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function authorizeConsumerRequestToken($token, $user_id, $referrer_host = '')
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function countConsumerAccessTokens($consumer_key)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function countConsumerAccessTokens($consumer_key)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function exchangeConsumerRequestForAccessToken($token, $options = array())
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function exchangeConsumerRequestForAccessToken($token, $options = array())
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function getConsumerAccessToken($token, $user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function getConsumerAccessToken($token, $user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function deleteConsumerAccessToken($token, $user_id, $user_is_admin = false)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function deleteConsumerAccessToken($token, $user_id, $user_is_admin = false)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function setConsumerAccessTokenTtl($token, $ttl)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function setConsumerAccessTokenTtl($token, $ttl)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function listConsumers($user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function listConsumers($user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function listConsumerApplications($begin = 0, $total = 25)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function listConsumerApplications($begin = 0, $total = 25)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function listConsumerTokens($user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function listConsumerTokens($user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function checkServerNonce($consumer_key, $token, $timestamp, $nonce)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function checkServerNonce($consumer_key, $token, $timestamp, $nonce)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function addLog($keys, $received, $sent, $base_string, $notes, $user_id = null)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function addLog($keys, $received, $sent, $base_string, $notes, $user_id = null)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function listLog($options, $user_id)
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 
-	public function listLog($options, $user_id)
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
-
-	public function install()
-	{
-		throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
-	}
+    public function install()
+    {
+        throw new OAuthException2("OAuthStore2Leg doesn't support ".__METHOD__);
+    }
 }
-
-?>

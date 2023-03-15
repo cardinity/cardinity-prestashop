@@ -62,38 +62,34 @@ print_r($xrds);
  */
 function xrds_parse($data)
 {
-	$oauth = array();
-	$doc = @DOMDocument::loadXML($data);
-	if ($doc === false)
-	{
-		throw new Exception('Error in XML, can\'t load XRDS document');
-	}
+    $oauth = array();
+    $doc = @DOMDocument::loadXML($data);
+    if ($doc === false) {
+        throw new Exception('Error in XML, can\'t load XRDS document');
+    }
 
-	$xpath = new DOMXPath($doc);
-	$xpath->registerNamespace('xrds', 'xri://$xrds');
-	$xpath->registerNamespace('xrd', 'xri://$XRD*($v*2.0)');
-	$xpath->registerNamespace('simple', 'http://xrds-simple.net/core/1.0');
+    $xpath = new DOMXPath($doc);
+    $xpath->registerNamespace('xrds', 'xri://$xrds');
+    $xpath->registerNamespace('xrd', 'xri://$XRD*($v*2.0)');
+    $xpath->registerNamespace('simple', 'http://xrds-simple.net/core/1.0');
 
-	// Yahoo! uses this namespace, with lowercase xrd in it
-	$xpath->registerNamespace('xrd2', 'xri://$xrd*($v*2.0)');
+    // Yahoo! uses this namespace, with lowercase xrd in it
+    $xpath->registerNamespace('xrd2', 'xri://$xrd*($v*2.0)');
 
-	$uris = xrds_oauth_service_uris($xpath);
+    $uris = xrds_oauth_service_uris($xpath);
 
-	foreach ($uris as $uri)
-	{
-		// TODO: support uris referring to service documents outside this one
-		if ($uri{0} == '#')
-		{
-			$id = substr($uri, 1);
-			$oauth = xrds_xrd_oauth($xpath, $id);
-			if (is_array($oauth) && ! empty($oauth))
-			{
-				return $oauth;
-			}
-		}
-	}
+    foreach ($uris as $uri) {
+        // TODO: support uris referring to service documents outside this one
+        if ($uri{0} == '#') {
+            $id = substr($uri, 1);
+            $oauth = xrds_xrd_oauth($xpath, $id);
+            if (is_array($oauth) && ! empty($oauth)) {
+                return $oauth;
+            }
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
@@ -106,53 +102,45 @@ function xrds_parse($data)
  */
 function xrds_xrd_oauth($xpath, $id)
 {
-	$oauth = array();
-	$xrd = $xpath->query('//xrds:XRDS/xrd:XRD[@xml:id="'.$id.'"]');
-	if ($xrd->length == 0)
-	{
-		// Yahoo! uses another namespace
-		$xrd = $xpath->query('//xrds:XRDS/xrd2:XRD[@xml:id="'.$id.'"]');
-	}
+    $oauth = array();
+    $xrd = $xpath->query('//xrds:XRDS/xrd:XRD[@xml:id="'.$id.'"]');
+    if ($xrd->length == 0) {
+        // Yahoo! uses another namespace
+        $xrd = $xpath->query('//xrds:XRDS/xrd2:XRD[@xml:id="'.$id.'"]');
+    }
 
-	if ($xrd->length >= 1)
-	{
-		$x = $xrd->item(0);
-		$services = array();
-		foreach ($x->childNodes as $n)
-		{
-			switch ($n->nodeName)
-			{
-				case 'Type':
-					if ($n->nodeValue != 'xri://$xrds*simple')
-					{
-						// Not a simple XRDS document
-						return false;
-					}
-					break;
-				case 'Expires':
-					$oauth['expires'] = $n->nodeValue;
-					break;
-				case 'Service':
-					list($type, $service) = xrds_xrd_oauth_service($n);
-					if ($type)
-					{
-						$services[$type][xrds_priority($n)][] = $service;
-					}
-					break;
-			}
-		}
+    if ($xrd->length >= 1) {
+        $x = $xrd->item(0);
+        $services = array();
+        foreach ($x->childNodes as $n) {
+            switch ($n->nodeName) {
+                case 'Type':
+                    if ($n->nodeValue != 'xri://$xrds*simple') {
+                        // Not a simple XRDS document
+                        return false;
+                    }
+                    break;
+                case 'Expires':
+                    $oauth['expires'] = $n->nodeValue;
+                    break;
+                case 'Service':
+                    list($type, $service) = xrds_xrd_oauth_service($n);
+                    if ($type) {
+                        $services[$type][xrds_priority($n)][] = $service;
+                    }
+                    break;
+            }
+        }
 
-		// Flatten the services on priority
-		foreach ($services as $type => $service)
-		{
-			$oauth[$type] = xrds_priority_flatten($service);
-		}
-	} else
-	{
-		$oauth = false;
-	}
+        // Flatten the services on priority
+        foreach ($services as $type => $service) {
+            $oauth[$type] = xrds_priority_flatten($service);
+        }
+    } else {
+        $oauth = false;
+    }
 
-	return $oauth;
+    return $oauth;
 }
 
 
@@ -164,52 +152,42 @@ function xrds_xrd_oauth($xpath, $id)
  */
 function xrds_xrd_oauth_service($n)
 {
-	$service = array(
-		'uri'              => '',
-		'signature_method' => array(),
-		'parameters'       => array()
-	);
+    $service = array(
+        'uri'              => '',
+        'signature_method' => array(),
+        'parameters'       => array()
+    );
 
-	$type = false;
-	foreach ($n->childNodes as $c)
-	{
-		$name = $c->nodeName;
-		$value = $c->nodeValue;
+    $type = false;
+    foreach ($n->childNodes as $c) {
+        $name = $c->nodeName;
+        $value = $c->nodeValue;
 
-		if ($name == 'URI')
-		{
-			$service['uri'] = $value;
-		} else if ($name == 'Type')
-		{
-			if (strncmp($value, 'http://oauth.net/core/1.0/endpoint/', 35) == 0)
-			{
-				$type = basename($value);
-			} else if (strncmp($value, 'http://oauth.net/core/1.0/signature/', 36) == 0)
-			{
-				$service['signature_method'][] = basename($value);
-			} else if (strncmp($value, 'http://oauth.net/core/1.0/parameters/', 37) == 0)
-			{
-				$service['parameters'][] = basename($value);
-			} else if (strncmp($value, 'http://oauth.net/discovery/1.0/consumer-identity/', 49) == 0)
-			{
-				$type = 'consumer_identity';
-				$service['method'] = basename($value);
-				unset($service['signature_method']);
-				unset($service['parameters']);
-			} else
-			{
-				$service['unknown'][] = $value;
-			}
-		} else if ($name == 'LocalID')
-		{
-			$service['consumer_key'] = $value;
-		} else if ($name{0} != '#')
-		{
-			$service[strtolower($name)] = $value;
-		}
-	}
+        if ($name == 'URI') {
+            $service['uri'] = $value;
+        } elseif ($name == 'Type') {
+            if (strncmp($value, 'http://oauth.net/core/1.0/endpoint/', 35) == 0) {
+                $type = basename($value);
+            } elseif (strncmp($value, 'http://oauth.net/core/1.0/signature/', 36) == 0) {
+                $service['signature_method'][] = basename($value);
+            } elseif (strncmp($value, 'http://oauth.net/core/1.0/parameters/', 37) == 0) {
+                $service['parameters'][] = basename($value);
+            } elseif (strncmp($value, 'http://oauth.net/discovery/1.0/consumer-identity/', 49) == 0) {
+                $type = 'consumer_identity';
+                $service['method'] = basename($value);
+                unset($service['signature_method']);
+                unset($service['parameters']);
+            } else {
+                $service['unknown'][] = $value;
+            }
+        } elseif ($name == 'LocalID') {
+            $service['consumer_key'] = $value;
+        } elseif ($name{0} != '#') {
+            $service[strtolower($name)] = $value;
+        }
+    }
 
-	return array($type, $service);
+    return array($type, $service);
 }
 
 
@@ -221,28 +199,24 @@ function xrds_xrd_oauth_service($n)
  */
 function xrds_oauth_service_uris($xpath)
 {
-	$uris = array();
-	$xrd_oauth = $xpath->query('//xrds:XRDS/xrd:XRD/xrd:Service/xrd:Type[.=\'http://oauth.net/discovery/1.0\']');
-	if ($xrd_oauth->length > 0)
-	{
-		$service = array();
-		foreach ($xrd_oauth as $xo)
-		{
-			// Find the URI of the service definition
-			$cs = $xo->parentNode->childNodes;
-			foreach ($cs as $c)
-			{
-				if ($c->nodeName == 'URI')
-				{
-					$prio = xrds_priority($xo);
-					$service[$prio][] = $c->nodeValue;
-				}
-			}
-		}
-		$uris = xrds_priority_flatten($service);
-	}
+    $uris = array();
+    $xrd_oauth = $xpath->query('//xrds:XRDS/xrd:XRD/xrd:Service/xrd:Type[.=\'http://oauth.net/discovery/1.0\']');
+    if ($xrd_oauth->length > 0) {
+        $service = array();
+        foreach ($xrd_oauth as $xo) {
+            // Find the URI of the service definition
+            $cs = $xo->parentNode->childNodes;
+            foreach ($cs as $c) {
+                if ($c->nodeName == 'URI') {
+                    $prio = xrds_priority($xo);
+                    $service[$prio][] = $c->nodeValue;
+                }
+            }
+        }
+        $uris = xrds_priority_flatten($service);
+    }
 
-	return $uris;
+    return $uris;
 }
 
 
@@ -254,25 +228,21 @@ function xrds_oauth_service_uris($xpath)
  */
 function xrds_priority_flatten($ps)
 {
-	$prio = array();
-	$null = array();
-	ksort($ps);
-	foreach ($ps as $idx => $bucket)
-	{
-		if (! empty($bucket))
-		{
-			if ($idx == 'null')
-			{
-				$null = $bucket;
-			} else
-			{
-				$prio = array_merge($prio, $bucket);
-			}
-		}
-	}
-	$prio = array_merge($prio, $bucket);
+    $prio = array();
+    $null = array();
+    ksort($ps);
+    foreach ($ps as $idx => $bucket) {
+        if (! empty($bucket)) {
+            if ($idx == 'null') {
+                $null = $bucket;
+            } else {
+                $prio = array_merge($prio, $bucket);
+            }
+        }
+    }
+    $prio = array_merge($prio, $bucket);
 
-	return $prio;
+    return $prio;
 }
 
 
@@ -284,22 +254,17 @@ function xrds_priority_flatten($ps)
  */
 function xrds_priority($elt)
 {
-	if ($elt->hasAttribute('priority'))
-	{
-		$prio = $elt->getAttribute('priority');
-		if (is_numeric($prio))
-		{
-			$prio = intval($prio);
-		}
-	} else
-	{
-		$prio = 'null';
-	}
+    if ($elt->hasAttribute('priority')) {
+        $prio = $elt->getAttribute('priority');
+        if (is_numeric($prio)) {
+            $prio = intval($prio);
+        }
+    } else {
+        $prio = 'null';
+    }
 
-	return $prio;
+    return $prio;
 }
 
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */
-
-?>

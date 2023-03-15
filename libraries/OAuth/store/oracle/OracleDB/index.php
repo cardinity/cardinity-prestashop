@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Cardinity for Prestashop 1.7.x
+ *
+ * @author    Cardinity
+ * @copyright 2017
+ * @license   The MIT License (MIT)
+ * @link      https://cardinity.com
+ */
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 

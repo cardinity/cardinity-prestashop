@@ -20,7 +20,7 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
 
         foreach ($_POST as $key => $value) {
             if ($key == 'signature') {
-               continue;
+                continue;
             }
             $message .= $key . $value;
         }
@@ -31,7 +31,7 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
         $customer = new Customer($cart->id_customer);
         $postSignature = Tools::getValue('signature');//$_POST['signature'];
         $postStatus = Tools::getValue('status');//$_POST['status'];
-        
+
         if ($signature == $postSignature && $postStatus == 'approved') {
             // if everything is a success, mark the order as paid and redirect the client to a success page
             $this->module->validateOrder(

@@ -31,4 +31,3 @@
 
 echo 'Right now we do not have Oracle DB installer.
 Please find OracleDB folder here with this Table, Sequences and Procedures. You need to manually install/create DB schema and SP with your oracle DB. ';
-?>
