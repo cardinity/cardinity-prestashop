@@ -1,5 +1,13 @@
 <?php
 /**
+ * Cardinity for Prestashop 1.7.x
+ *
+ * @author    Cardinity
+ * @copyright 2017
+ * @license   The MIT License (MIT)
+ * @link      https://cardinity.com
+ */
+/**
  * OAuthStorePostgreSQL.php
  *
  * PHP Version 5.2

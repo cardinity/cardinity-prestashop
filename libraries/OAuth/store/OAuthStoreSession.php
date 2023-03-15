@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Cardinity for Prestashop 1.7.x
+ *
+ * @author    Cardinity
+ * @copyright 2017
+ * @license   The MIT License (MIT)
+ * @link      https://cardinity.com
+ */
 /**
  * OAuthSession is a really *dirty* storage. It's useful for testing and may
  * be enough for some very simple applications, but it's not recommended for

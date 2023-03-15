@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Cardinity for Prestashop 1.7.x
+ *
+ * @author    Cardinity
+ * @copyright 2017
+ * @license   The MIT License (MIT)
+ * @link      https://cardinity.com
+ */
 /**
  * Storage container for the oauth credentials, both server and consumer side.
  * This file can only be used in conjunction with anyMeta.

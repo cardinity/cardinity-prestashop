@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Cardinity for Prestashop 1.7.x
+ *
+ * @author    Cardinity
+ * @copyright 2017
+ * @license   The MIT License (MIT)
+ * @link      https://cardinity.com
+ */
 /**
  * Request wrapper class.  Prepares a request for consumption by the OAuth routines
  *

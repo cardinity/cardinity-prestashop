@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Cardinity for Prestashop 1.7.x
+ *
+ * @author    Cardinity
+ * @copyright 2017
+ * @license   The MIT License (MIT)
+ * @link      https://cardinity.com
+ */
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{cardinity}prestashop>cardinity_b08d142a6de465237eeade02f7f41b4a'] = 'Cardinity';

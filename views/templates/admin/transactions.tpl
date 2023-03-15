@@ -1,3 +1,8 @@
+{*
+* @author       Cardinity
+* @link         https://cardinity.com
+* @license      The MIT License (MIT)
+*}
     <form method="POST" action="?controller={$smarty.get.controller}&configure={$smarty.get.configure}&token={$smarty.get.token}">
         <div class="panel" id="fieldset_0">
             <div class="panel-heading">

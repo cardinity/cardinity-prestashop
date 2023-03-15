@@ -1,7 +1,10 @@
 /**
- * @author      Cardinity
- * @link        https://cardinity.com
- * @license     The MIT License (MIT)
+ * Cardinity for Prestashop 1.7.x
+ *
+ * @author    Cardinity
+ * @copyright 2017
+ * @license   The MIT License (MIT)
+ * @link      https://cardinity.com
  */
 $(document).ready(function () {
 

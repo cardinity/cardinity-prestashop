@@ -158,9 +158,9 @@ class Cardinity extends PaymentModule
     {
         $logMessage = '';
 
-        if(isset($_POST['subaction']) && $_POST['subaction']== 'downloadlog'){            
+        if(Tools::getValue('subaction', false) == 'downloadlog'){            
 
-            $currentFilename = "transactions-". $_POST['year'] .'-'. $_POST['month'];
+            $currentFilename = "transactions-". Tools::getValue('year') .'-'. Tools::getValue('month');
             
             $currentDir = dirname(__FILE__);
             $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'var'.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR . $currentFilename .'.log';
@@ -180,7 +180,7 @@ class Cardinity extends PaymentModule
                 
 				//exit;
 			}else{
-                $logMessage = "<div class='alert alert-info'>No transaction log found for - ".$_POST['year'] .' / '. $_POST['month']." .</div>";
+                $logMessage = "<div class='alert alert-info'>No transaction log found for - ".Tools::getValue('yesar') .' / '. Tools::getValue('month')." .</div>";
             }
         }
 
