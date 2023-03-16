@@ -105,17 +105,17 @@ return (new PhpCsFixer\Config())
             'syntax' => 'short',
         ],
         'phpdoc_annotation_without_dot' => true,
-        'no_blank_lines_after_phpdoc' => true,
         'logical_operators' => true,
         'php_unit_test_case_static_method_calls' => ['call_type' => 'this'],
         'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
         'dir_constant' => false,
-        'header_comment' => [
+        /*'header_comment' => [
             'header' => $licenseHeader,
             'comment_type' => 'PHPDoc',
             'location' => 'after_open',
             'separate' => 'bottom',
-        ],
+        ],*/
+        'no_blank_lines_after_phpdoc' => true,
     ])
     ->setFinder($finder)
 ;

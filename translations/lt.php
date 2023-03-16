@@ -35,7 +35,6 @@
  * Don't forget to prefix your containers with your own identifier
  * to avoid any conflicts with others containers.
  */
-
 global $_MODULE;
 $_MODULE = [];
 $_MODULE['<{cardinity}prestashop>cardinity_b08d142a6de465237eeade02f7f41b4a'] = 'Cardinity';
