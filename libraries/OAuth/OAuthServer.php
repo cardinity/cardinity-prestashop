@@ -1,19 +1,49 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Server layer over the OAuthRequest handler
  *
  * @version $Id: OAuthServer.php 154 2010-08-31 18:04:41Z brunobg@corollarium.com $
- * @author Marc Worrell <marcw@pobox.com>
- * @date  Nov 27, 2007 12:36:38 PM
  *
+ * @author Marc Worrell <marcw@pobox.com>
+ *
+ * @date  Nov 27, 2007 12:36:38 PM
  *
  * The MIT License
  *
@@ -37,7 +67,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 require_once 'OAuthRequestVerifier.php';
 require_once 'OAuthSession.php';
 
@@ -45,16 +74,16 @@ class OAuthServer extends OAuthRequestVerifier
 {
     protected $session;
 
-    protected $allowed_uri_schemes = array(
+    protected $allowed_uri_schemes = [
         'http',
-        'https'
-    );
+        'https',
+    ];
 
-    protected $disallowed_uri_schemes = array(
+    protected $disallowed_uri_schemes = [
         'file',
         'callto',
-        'mailto'
-    );
+        'mailto',
+    ];
 
     /**
      * Construct the request to be verified
@@ -85,15 +114,14 @@ class OAuthServer extends OAuthRequestVerifier
      *     'allowed_uri_schemes' => array(),
      *     'disallowed_uri_schemes' => array()
      * );
-     *
      */
     public function __construct(
         $uri = null,
         $method = null,
         $params = null,
         $store = 'SESSION',
-        $store_options = array(),
-        $options = array()
+        $store_options = [],
+        $options = []
     ) {
         parent::__construct($uri, $method, $params);
         $this->session = OAuthSession::instance($store, $store_options);
@@ -112,7 +140,7 @@ class OAuthServer extends OAuthRequestVerifier
      *
      * TODO: add correct result code to exception
      *
-     * @return string    returned request token, false on an error
+     * @return string returned request token, false on an error
      */
     public function requestToken()
     {
@@ -120,7 +148,7 @@ class OAuthServer extends OAuthRequestVerifier
         try {
             $this->verify(false);
 
-            $options = array();
+            $options = [];
             $ttl = $this->getParam('xoauth_token_ttl', false);
             if ($ttl) {
                 $options['token_ttl'] = $ttl;
@@ -135,17 +163,17 @@ class OAuthServer extends OAuthRequestVerifier
             // Create a request token
             $store = OAuthStore::instance();
             $token = $store->addConsumerRequestToken($this->getParam('oauth_consumer_key', true), $options);
-            $result = 'oauth_callback_confirmed=1&oauth_token='.$this->urlencode($token['token'])
-                .'&oauth_token_secret='.$this->urlencode($token['token_secret']);
+            $result = 'oauth_callback_confirmed=1&oauth_token=' . $this->urlencode($token['token'])
+                . '&oauth_token_secret=' . $this->urlencode($token['token_secret']);
 
-            if (! empty($token['token_ttl'])) {
-                $result .= '&xoauth_token_ttl='.$this->urlencode($token['token_ttl']);
+            if (!empty($token['token_ttl'])) {
+                $result .= '&xoauth_token_ttl=' . $this->urlencode($token['token_ttl']);
             }
 
             $request_token = $token['token'];
 
             header('HTTP/1.1 200 OK');
-            header('Content-Length: '.strlen($result));
+            header('Content-Length: ' . strlen($result));
             header('Content-Type: application/x-www-form-urlencoded');
 
             echo $result;
@@ -155,14 +183,13 @@ class OAuthServer extends OAuthRequestVerifier
             header('HTTP/1.1 401 Unauthorized');
             header('Content-Type: text/plain');
 
-            echo "OAuth Verification Failed: ".$e->getMessage();
+            echo 'OAuth Verification Failed: ' . $e->getMessage();
         }
 
         OAuthRequestLogger::flush();
 
         return $request_token;
     }
-
 
     /**
      * Verify the start of an authorization request.  Verifies if the request token is valid.
@@ -171,6 +198,7 @@ class OAuthServer extends OAuthRequestVerifier
      * Nota bene: this stores the current token, consumer key and callback in the _SESSION
      *
      * @exception OAuthException2 thrown when not a valid request
+     *
      * @return array token description
      */
     public function authorizeVerify()
@@ -181,7 +209,7 @@ class OAuthServer extends OAuthRequestVerifier
         $token = $this->getParam('oauth_token', true);
         $rs = $store->getConsumerRequestToken($token);
         if (empty($rs)) {
-            throw new OAuthException2('Unknown request token "'.$token.'"');
+            throw new OAuthException2('Unknown request token "' . $token . '"');
         }
 
         // We need to remember the callback
@@ -203,14 +231,14 @@ class OAuthServer extends OAuthRequestVerifier
         return $rs;
     }
 
-
     /**
      * Overrule this method when you want to display a nice page when
      * the authorization is finished.  This function does not know if the authorization was
      * succesfull, you need to check the token in the database.
      *
-     * @param boolean authorized    if the current token (oauth_token param) is authorized or not
+     * @param bool authorized    if the current token (oauth_token param) is authorized or not
      * @param int user_id            user for which the token was authorized (or denied)
+     *
      * @return string verifier  For 1.0a Compatibility
      */
     public function authorizeFinish($authorized, $user_id)
@@ -227,7 +255,7 @@ class OAuthServer extends OAuthRequestVerifier
             $referrer_host = '';
             $oauth_callback = false;
             $verify_oauth_callback = $this->session->get('verify_oauth_callback');
-            if (! empty($verify_oauth_callback) && $verify_oauth_callback != 'oob') { // OUT OF BAND
+            if (!empty($verify_oauth_callback) && 'oob' != $verify_oauth_callback) { // OUT OF BAND
                 $oauth_callback = $this->session->get('verify_oauth_callback');
                 $ps = parse_url($oauth_callback);
                 if (isset($ps['host'])) {
@@ -236,29 +264,29 @@ class OAuthServer extends OAuthRequestVerifier
             }
 
             if ($authorized) {
-                OAuthRequestLogger::addNote('Authorized token "'.$token.'" for user '.$user_id.' with referrer "'.$referrer_host.'"');
+                OAuthRequestLogger::addNote('Authorized token "' . $token . '" for user ' . $user_id . ' with referrer "' . $referrer_host . '"');
                 // 1.0a Compatibility : create a verifier code
                 $verifier = $store->authorizeConsumerRequestToken($token, $user_id, $referrer_host);
             } else {
-                OAuthRequestLogger::addNote('Authorization rejected for token "'.$token.'" for user '.$user_id."\nToken has been deleted");
+                OAuthRequestLogger::addNote('Authorization rejected for token "' . $token . '" for user ' . $user_id . "\nToken has been deleted");
                 $store->deleteConsumerRequestToken($token);
             }
 
-            if (! empty($oauth_callback)) {
-                $params = array('oauth_token' => rawurlencode($token));
+            if (!empty($oauth_callback)) {
+                $params = ['oauth_token' => rawurlencode($token)];
                 // 1.0a Compatibility : if verifier code has been generated, add it to the URL
                 if ($verifier) {
                     $params['oauth_verifier'] = $verifier;
                 }
 
                 $uri = preg_replace('/\s/', '%20', $oauth_callback);
-                if (! empty($this->allowed_uri_schemes)) {
-                    if (! in_array(substr($uri, 0, strpos($uri, '://')), $this->allowed_uri_schemes)) {
-                        throw new OAuthException2('Illegal protocol in redirect uri '.$uri);
+                if (!empty($this->allowed_uri_schemes)) {
+                    if (!in_array(substr($uri, 0, strpos($uri, '://')), $this->allowed_uri_schemes)) {
+                        throw new OAuthException2('Illegal protocol in redirect uri ' . $uri);
                     }
-                } elseif (! empty($this->disallowed_uri_schemes)) {
+                } elseif (!empty($this->disallowed_uri_schemes)) {
                     if (in_array(substr($uri, 0, strpos($uri, '://')), $this->disallowed_uri_schemes)) {
-                        throw new OAuthException2('Illegal protocol in redirect uri '.$uri);
+                        throw new OAuthException2('Illegal protocol in redirect uri ' . $uri);
                     }
                 }
 
@@ -269,7 +297,6 @@ class OAuthServer extends OAuthRequestVerifier
 
         return $verifier;
     }
-
 
     /**
      * Exchange a request token for an access token.
@@ -284,7 +311,7 @@ class OAuthServer extends OAuthRequestVerifier
         try {
             $this->verify('request');
 
-            $options = array();
+            $options = [];
             $ttl = $this->getParam('xoauth_token_ttl', false);
             if ($ttl) {
                 $options['token_ttl'] = $ttl;
@@ -297,15 +324,15 @@ class OAuthServer extends OAuthRequestVerifier
 
             $store = OAuthStore::instance();
             $token = $store->exchangeConsumerRequestForAccessToken($this->getParam('oauth_token', true), $options);
-            $result = 'oauth_token='.$this->urlencode($token['token'])
-                .'&oauth_token_secret='.$this->urlencode($token['token_secret']);
+            $result = 'oauth_token=' . $this->urlencode($token['token'])
+                . '&oauth_token_secret=' . $this->urlencode($token['token_secret']);
 
-            if (! empty($token['token_ttl'])) {
-                $result .= '&xoauth_token_ttl='.$this->urlencode($token['token_ttl']);
+            if (!empty($token['token_ttl'])) {
+                $result .= '&xoauth_token_ttl=' . $this->urlencode($token['token_ttl']);
             }
 
             header('HTTP/1.1 200 OK');
-            header('Content-Length: '.strlen($result));
+            header('Content-Length: ' . strlen($result));
             header('Content-Type: application/x-www-form-urlencoded');
 
             echo $result;
@@ -313,11 +340,11 @@ class OAuthServer extends OAuthRequestVerifier
             header('HTTP/1.1 401 Access Denied');
             header('Content-Type: text/plain');
 
-            echo "OAuth Verification Failed: ".$e->getMessage();
+            echo 'OAuth Verification Failed: ' . $e->getMessage();
         }
 
         OAuthRequestLogger::flush();
-        exit();
+        exit;
     }
 }
 

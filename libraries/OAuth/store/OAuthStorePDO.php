@@ -1,19 +1,48 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Storage container for the oauth credentials, both server and consumer side.
  * Based on MySQL
  *
  * @version $Id: OAuthStorePDO.php 64 2009-08-16 19:37:00Z marcw@pobox.com $
- * @author Bruno Barberi Gnecco <brunobg@users.sf.net> Based on code by Marc Worrell <marcw@pobox.com>
  *
+ * @author Bruno Barberi Gnecco <brunobg@users.sf.net> Based on code by Marc Worrell <marcw@pobox.com>
  *
  * The MIT License
  *
@@ -37,9 +66,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-require_once dirname(__FILE__).'/OAuthStoreSQL.php';
-
+require_once dirname(__FILE__) . '/OAuthStoreSQL.php';
 
 class OAuthStorePDO extends OAuthStoreSQL
 {
@@ -54,7 +81,7 @@ class OAuthStorePDO extends OAuthStoreSQL
      *
      * @param array options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         if (isset($options['conn'])) {
             $this->conn = $options['conn'];
@@ -62,7 +89,7 @@ class OAuthStorePDO extends OAuthStoreSQL
             try {
                 $this->conn = new PDO($options['dsn'], $options['username'], @$options['password']);
             } catch (PDOException $e) {
-                throw new OAuthException2('Could not connect to PDO database: '.$e->getMessage());
+                throw new OAuthException2('Could not connect to PDO database: ' . $e->getMessage());
             }
 
             $this->query('set character set utf8');
@@ -80,7 +107,7 @@ class OAuthStorePDO extends OAuthStoreSQL
         $sql = $this->sql_printf(func_get_args());
         try {
             $this->lastaffectedrows = $this->conn->exec($sql);
-            if ($this->lastaffectedrows === false) {
+            if (false === $this->lastaffectedrows) {
                 $this->sql_errcheck($sql);
             }
         } catch (PDOException $e) {
@@ -88,18 +115,18 @@ class OAuthStorePDO extends OAuthStoreSQL
         }
     }
 
-
     /**
      * Perform a query, ignore the results
      *
      * @param string sql
      * @param vararg arguments (for sprintf)
+     *
      * @return array
      */
     protected function query_all_assoc($sql)
     {
         $sql = $this->sql_printf(func_get_args());
-        $result = array();
+        $result = [];
 
         try {
             $stmt = $this->conn->query($sql);
@@ -112,12 +139,12 @@ class OAuthStorePDO extends OAuthStoreSQL
         return $result;
     }
 
-
     /**
      * Perform a query, return the first row
      *
      * @param string sql
      * @param vararg arguments (for sprintf)
+     *
      * @return array
      */
     protected function query_row_assoc($sql)
@@ -129,12 +156,12 @@ class OAuthStorePDO extends OAuthStoreSQL
         return $val;
     }
 
-
     /**
      * Perform a query, return the first row
      *
      * @param string sql
      * @param vararg arguments (for sprintf)
+     *
      * @return array
      */
     protected function query_row($sql)
@@ -142,7 +169,7 @@ class OAuthStorePDO extends OAuthStoreSQL
         $sql = $this->sql_printf(func_get_args());
         try {
             $all = $this->conn->query($sql, PDO::FETCH_NUM);
-            $row = array();
+            $row = [];
             foreach ($all as $r) {
                 $row = $r;
                 break;
@@ -154,12 +181,12 @@ class OAuthStorePDO extends OAuthStoreSQL
         return $row;
     }
 
-
     /**
      * Perform a query, return the first column of the first row
      *
      * @param string sql
      * @param vararg arguments (for sprintf)
+     *
      * @return mixed
      */
     protected function query_one($sql)
@@ -171,7 +198,6 @@ class OAuthStorePDO extends OAuthStoreSQL
         return $val;
     }
 
-
     /**
      * Return the number of rows affected in the last query
      */
@@ -179,7 +205,6 @@ class OAuthStorePDO extends OAuthStoreSQL
     {
         return $this->lastaffectedrows;
     }
-
 
     /**
      * Return the id of the last inserted row
@@ -191,18 +216,16 @@ class OAuthStorePDO extends OAuthStoreSQL
         return $this->conn->lastInsertId();
     }
 
-
     protected function sql_printf($args)
     {
         $sql = array_shift($args);
-        if (count($args) == 1 && is_array($args[0])) {
+        if (1 == count($args) && is_array($args[0])) {
             $args = $args[0];
         }
-        $args = array_map(array($this, 'sql_escape_string'), $args);
+        $args = array_map([$this, 'sql_escape_string'], $args);
 
         return vsprintf($sql, $args);
     }
-
 
     protected function sql_escape_string($s)
     {
@@ -211,40 +234,39 @@ class OAuthStorePDO extends OAuthStoreSQL
             // kludge. Quote already adds quotes, and this conflicts with OAuthStoreSQL.
             // so remove the quotes
             $len = mb_strlen($s);
-            if ($len == 0) {
+            if (0 == $len) {
                 return $s;
             }
 
             $startcut = 0;
-            while (isset($s[$startcut]) && $s[$startcut] == '\'') {
-                $startcut++;
+            while (isset($s[$startcut]) && '\'' == $s[$startcut]) {
+                ++$startcut;
             }
 
             $endcut = $len - 1;
-            while (isset($s[$endcut]) && $s[$endcut] == '\'') {
-                $endcut--;
+            while (isset($s[$endcut]) && '\'' == $s[$endcut]) {
+                --$endcut;
             }
 
             $s = mb_substr($s, $startcut, $endcut - $startcut + 1);
 
             return $s;
-        } elseif (is_null($s)) {
+        } elseif (null === $s) {
             return null;
         } elseif (is_bool($s)) {
-            return intval($s);
+            return (int) $s;
         } elseif (is_int($s) || is_float($s)) {
             return $s;
         } else {
-            return $this->conn->quote(strval($s));
+            return $this->conn->quote((string) $s);
         }
     }
 
-
     protected function sql_errcheck($sql)
     {
-        $msg = "SQL Error in OAuthStoreMySQL: ".print_r($this->conn->errorInfo(), true)."\n\n".$sql;
+        $msg = 'SQL Error in OAuthStoreMySQL: ' . print_r($this->conn->errorInfo(), true) . "\n\n" . $sql;
         $backtrace = debug_backtrace();
-        $msg .= "\n\nAt file ".$backtrace[1]['file'].", line ".$backtrace[1]['line'];
+        $msg .= "\n\nAt file " . $backtrace[1]['file'] . ', line ' . $backtrace[1]['line'];
         throw new OAuthException2($msg);
     }
 
@@ -254,9 +276,8 @@ class OAuthStorePDO extends OAuthStoreSQL
     public function install()
     {
         // TODO: this depends on mysql extension
-        require_once dirname(__FILE__).'/mysql/install.php';
+        require_once dirname(__FILE__) . '/mysql/install.php';
     }
 }
-
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */

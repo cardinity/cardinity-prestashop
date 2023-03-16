@@ -1,16 +1,46 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Abstract base class for OAuthStore implementations
  *
  * @version $Id$
+ *
  * @author Marc Worrell <marcw@pobox.com>
  *
  * The MIT License
@@ -43,7 +73,7 @@ abstract class OAuthStoreAbstract
 
     abstract public function getServerTokenSecrets($consumer_key, $token, $token_type, $user_id, $name = '');
 
-    abstract public function addServerToken($consumer_key, $token_type, $token, $token_secret, $user_id, $options = array());
+    abstract public function addServerToken($consumer_key, $token_type, $token, $token_secret, $user_id, $options = []);
 
     abstract public function deleteServer($consumer_key, $user_id, $user_is_admin = false);
 
@@ -71,7 +101,7 @@ abstract class OAuthStoreAbstract
 
     abstract public function getConsumerStatic();
 
-    abstract public function addConsumerRequestToken($consumer_key, $options = array());
+    abstract public function addConsumerRequestToken($consumer_key, $options = []);
 
     abstract public function getConsumerRequestToken($token);
 
@@ -81,7 +111,7 @@ abstract class OAuthStoreAbstract
 
     abstract public function countConsumerAccessTokens($consumer_key);
 
-    abstract public function exchangeConsumerRequestForAccessToken($token, $options = array());
+    abstract public function exchangeConsumerRequestForAccessToken($token, $options = []);
 
     abstract public function getConsumerAccessToken($token, $user_id);
 
@@ -107,16 +137,16 @@ abstract class OAuthStoreAbstract
      * Fetch the current static consumer key for this site, create it when it was not found.
      * The consumer secret for the consumer key is always empty.
      *
-     * @return string    consumer key
+     * @return string consumer key
      */
-
 
     /* ** Some handy utility functions ** */
 
     /**
      * Generate a unique key
      *
-     * @param boolean unique    force the key to be unique
+     * @param bool unique    force the key to be unique
+     *
      * @return string
      */
     public function generateKey($unique = false)
@@ -124,7 +154,7 @@ abstract class OAuthStoreAbstract
         $key = md5(uniqid(rand(), true));
         if ($unique) {
             list($usec, $sec) = explode(' ', microtime());
-            $key .= dechex($usec).dechex($sec);
+            $key .= dechex($usec) . dechex($sec);
         }
 
         return $key;
@@ -134,7 +164,8 @@ abstract class OAuthStoreAbstract
      * Check to see if a string is valid utf8
      *
      * @param string $s
-     * @return boolean
+     *
+     * @return bool
      */
     protected function isUTF8($s)
     {
@@ -149,11 +180,11 @@ abstract class OAuthStoreAbstract
 	       )+%xs', $s);
     }
 
-
     /**
      * Make a string utf8, replacing all non-utf8 chars with a '.'
      *
      * @param string
+     *
      * @return string
      */
     protected function makeUTF8($s)
@@ -164,10 +195,10 @@ abstract class OAuthStoreAbstract
                 $text = @iconv('UTF-8', 'UTF-8//TRANSLIT', $s);
                 if (strlen($text) != strlen($s)) {
                     // Remove the offending character...
-                    $s = $text.'.'.substr($s, strlen($text) + 1);
+                    $s = $text . '.' . substr($s, strlen($text) + 1);
                     $ok = false;
                 }
-            } while (! $ok);
+            } while (!$ok);
         }
 
         return $s;

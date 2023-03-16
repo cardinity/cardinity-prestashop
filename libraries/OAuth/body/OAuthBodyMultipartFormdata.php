@@ -1,17 +1,48 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Create the body for a multipart/form-data message.
  *
  * @version $Id: OAuthMultipartFormdata.php 6 2008-02-13 12:35:09Z marcw@pobox.com $
+ *
  * @author Marc Worrell <marcw@pobox.com>
+ *
  * @date  Jan 31, 2008 12:50:05 PM
  *
  * The MIT License
@@ -47,21 +78,21 @@ class OAuthBodyMultipartFormdata
      *
      * @param array params        (name => value) (all names and values should be urlencoded)
      * @param array files        (name => filedesc) (not urlencoded)
+     *
      * @return array (headers, body)
      */
     public static function encodeBody($params, $files)
     {
-        $headers = array();
+        $headers = [];
         $body = '';
-        $boundary = 'OAuthRequester_'.md5(uniqid('multipart').microtime());
-        $headers['Content-Type'] = 'multipart/form-data; boundary='.$boundary;
-
+        $boundary = 'OAuthRequester_' . md5(uniqid('multipart') . microtime());
+        $headers['Content-Type'] = 'multipart/form-data; boundary=' . $boundary;
 
         // 1. Add the parameters to the post
-        if (! empty($params)) {
+        if (!empty($params)) {
             foreach ($params as $name => $value) {
-                $body .= '--'.$boundary."\r\n";
-                $body .= 'Content-Disposition: form-data; name="'.OAuthBodyMultipartFormdata::encodeParameterName(rawurldecode($name)).'"';
+                $body .= '--' . $boundary . "\r\n";
+                $body .= 'Content-Disposition: form-data; name="' . OAuthBodyMultipartFormdata::encodeParameterName(rawurldecode($name)) . '"';
                 $body .= "\r\n\r\n";
                 $body .= urldecode($value);
                 $body .= "\r\n";
@@ -69,7 +100,7 @@ class OAuthBodyMultipartFormdata
         }
 
         // 2. Add all the files to the post
-        if (! empty($files)) {
+        if (!empty($files)) {
             $untitled = 1;
 
             foreach ($files as $name => $f) {
@@ -80,9 +111,9 @@ class OAuthBodyMultipartFormdata
                     $filename = $f['filename'];
                 }
 
-                if (! empty($f['file'])) {
+                if (!empty($f['file'])) {
                     $data = @file_get_contents($f['file']);
-                    if ($data === false) {
+                    if (false === $data) {
                         throw new OAuthException2(sprintf('Could not read the file "%s" for form-data part', $f['file']));
                     }
                     if (empty($filename)) {
@@ -93,27 +124,26 @@ class OAuthBodyMultipartFormdata
                 }
 
                 // When there is data, add it as a form-data part, otherwise silently skip the upload
-                if ($data !== false) {
+                if (false !== $data) {
                     if (empty($filename)) {
                         $filename = sprintf('untitled-%d', $untitled++);
                     }
-                    $mime = ! empty($f['mime']) ? $f['mime'] : 'application/octet-stream';
-                    $body .= '--'.$boundary."\r\n";
-                    $body .= 'Content-Disposition: form-data; name="'.OAuthBodyMultipartFormdata::encodeParameterName($name).'"; filename="'.OAuthBodyMultipartFormdata::encodeParameterName($filename).'"'."\r\n";
-                    $body .= 'Content-Type: '.$mime;
+                    $mime = !empty($f['mime']) ? $f['mime'] : 'application/octet-stream';
+                    $body .= '--' . $boundary . "\r\n";
+                    $body .= 'Content-Disposition: form-data; name="' . OAuthBodyMultipartFormdata::encodeParameterName($name) . '"; filename="' . OAuthBodyMultipartFormdata::encodeParameterName($filename) . '"' . "\r\n";
+                    $body .= 'Content-Type: ' . $mime;
                     $body .= "\r\n\r\n";
                     $body .= $data;
                     $body .= "\r\n";
                 }
             }
         }
-        $body .= '--'.$boundary."--\r\n";
+        $body .= '--' . $boundary . "--\r\n";
 
         $headers['Content-Length'] = strlen($body);
 
-        return array($headers, $body);
+        return [$headers, $body];
     }
-
 
     /**
      * Encode a parameter's name for use in a multipart header.
@@ -121,6 +151,7 @@ class OAuthBodyMultipartFormdata
      * We might want to implement RFC1522 here.  See http://tools.ietf.org/html/rfc1522
      *
      * @param string name
+     *
      * @return string
      */
     public static function encodeParameterName($name)
@@ -128,6 +159,5 @@ class OAuthBodyMultipartFormdata
         return preg_replace('/[^\x20-\x7f]|"/', '-', $name);
     }
 }
-
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */

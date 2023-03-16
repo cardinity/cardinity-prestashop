@@ -1,12 +1,41 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Added by Vinay Kant Sahu.
  * Replaced all the MySQL queries with Oracle SPs. (ref: OAuthStoreSQL.php)
@@ -16,6 +45,7 @@
  * Based on Oracle
  *
  * @author Vinay Kant Sahu <vinaykant.sahu@gmail.com>
+ *
  * @date  Aug 6, 2010
  *
  * The MIT License
@@ -38,8 +68,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-require_once dirname(__FILE__).'/OAuthStoreAbstract.class.php';
+require_once dirname(__FILE__) . '/OAuthStoreAbstract.class.php';
 
 abstract class OAuthStoreOracle extends OAuthStoreAbstract
 {
@@ -55,7 +84,6 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      */
     protected $max_request_token_ttl = MAX_REQUEST_TOKEN_TIME;
 
-
     /**
      * Construct the OAuthStoreMySQL.
      * In the options you have to supply either:
@@ -64,14 +92,14 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      *
      * @param array options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         if (isset($options['conn'])) {
             $this->conn = $options['conn'];
         } else {
             $this->conn = oci_connect(DBUSER, DBPASSWORD, DBHOST);
 
-            if ($this->conn === false) {
+            if (false === $this->conn) {
                 throw new OAuthException2('Could not connect to database');
             }
 
@@ -86,15 +114,17 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      * @param string consumer_key
      * @param string token
      * @param string token_type        false, 'request' or 'access'
+     *
      * @exception OAuthException2 when no secrets where found
-     * @return array    assoc (consumer_secret, token_secret, osr_id, ost_id, user_id)
+     *
+     * @return array assoc (consumer_secret, token_secret, osr_id, ost_id, user_id)
      */
     public function getSecretsForVerify($consumer_key, $token, $token_type = 'access')
     {
-        $sql = "BEGIN SP_GET_SECRETS_FOR_VERIFY(:P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_TYPE, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_SECRETS_FOR_VERIFY(:P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_TYPE, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -102,11 +132,11 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_TOKEN_TYPE', $token_type, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -115,12 +145,11 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
 
         $rs = $getSecretsForVerifyList;
         if (empty($rs)) {
-            throw new OAuthException2('The consumer_key "'.$consumer_key.'" token "'.$token.'" combination does not exist or is not enabled.');
+            throw new OAuthException2('The consumer_key "' . $consumer_key . '" token "' . $token . '" combination does not exist or is not enabled.');
         }
 
         return $rs[0];
     }
-
 
     /**
      * Find the server details for signing a request, always looks for an access token.
@@ -137,10 +166,13 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      * signature_methods    signing methods supported by the server (array)
      *
      * @todo filter on token type (we should know how and with what to sign this request, and there might be old access tokens)
+     *
      * @param string uri    uri of the server
      * @param int user_id    id of the logged on user
      * @param string name    (optional) name of the token (case sensitive)
+     *
      * @exception OAuthException2 when no credentials found
+     *
      * @return array
      */
     public function getSecretsForSignature($uri, $user_id, $name = '')
@@ -150,14 +182,14 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $host = isset($ps['host']) ? $ps['host'] : 'localhost';
         $path = isset($ps['path']) ? $ps['path'] : '';
 
-        if (empty($path) || substr($path, -1) != '/') {
+        if (empty($path) || '/' != substr($path, -1)) {
             $path .= '/';
         }
-        //
-        $sql = "BEGIN SP_GET_SECRETS_FOR_SIGNATURE(:P_HOST, :P_PATH, :P_USER_ID, :P_NAME, :P_ROWS, :P_RESULT); END;";
+
+        $sql = 'BEGIN SP_GET_SECRETS_FOR_SIGNATURE(:P_HOST, :P_PATH, :P_USER_ID, :P_NAME, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_HOST', $host, 255);
@@ -166,11 +198,11 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_NAME', $name, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -200,13 +232,12 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
                 );
         */
         if (empty($secrets)) {
-            throw new OAuthException2('No server tokens available for '.$uri);
+            throw new OAuthException2('No server tokens available for ' . $uri);
         }
         $secrets['signature_methods'] = explode(',', $secrets['signature_methods']);
 
         return $secrets;
     }
-
 
     /**
      * Get the token and token secret we obtained from a server.
@@ -216,19 +247,21 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      * @param string    token_type
      * @param int        user_id            the user owning the token
      * @param string    name            optional name for a named token
+     *
      * @exception OAuthException2 when no credentials found
+     *
      * @return array
      */
     public function getServerTokenSecrets($consumer_key, $token, $token_type, $user_id, $name = '')
     {
-        if ($token_type != 'request' && $token_type != 'access') {
-            throw new OAuthException2('Unkown token type "'.$token_type.'", must be either "request" or "access"');
+        if ('request' != $token_type && 'access' != $token_type) {
+            throw new OAuthException2('Unkown token type "' . $token_type . '", must be either "request" or "access"');
         }
-        //
-        $sql = "BEGIN SP_GET_SERVER_TOKEN_SECRETS(:P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_TYPE, :P_USER_ID, :P_ROWS, :P_RESULT); END;";
+
+        $sql = 'BEGIN SP_GET_SERVER_TOKEN_SECRETS(:P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_TYPE, :P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -237,11 +270,11 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -274,58 +307,58 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
                     );*/
 
         if (empty($r)) {
-            throw new OAuthException2('Could not find a "'.$token_type.'" token for consumer "'.$consumer_key.'" and user '.$user_id);
+            throw new OAuthException2('Could not find a "' . $token_type . '" token for consumer "' . $consumer_key . '" and user ' . $user_id);
         }
-        if (isset($r['signature_methods']) && ! empty($r['signature_methods'])) {
+        if (isset($r['signature_methods']) && !empty($r['signature_methods'])) {
             $r['signature_methods'] = explode(',', $r['signature_methods']);
         } else {
-            $r['signature_methods'] = array();
+            $r['signature_methods'] = [];
         }
 
         return $r;
     }
 
-
     /**
      * Add a request token we obtained from a server.
      *
      * @todo remove old tokens for this user and this ocr_id
+     *
      * @param string consumer_key    key of the server in the consumer registry
      * @param string token_type        one of 'request' or 'access'
      * @param string token
      * @param string token_secret
      * @param int     user_id            the user owning the token
      * @param array  options            extra options, name and token_ttl
+     *
      * @exception OAuthException2 when server is not known
      * @exception OAuthException2 when we received a duplicate token
      */
-    public function addServerToken($consumer_key, $token_type, $token, $token_secret, $user_id, $options = array())
+    public function addServerToken($consumer_key, $token_type, $token, $token_secret, $user_id, $options = [])
     {
-        if ($token_type != 'request' && $token_type != 'access') {
-            throw new OAuthException2('Unknown token type "'.$token_type.'", must be either "request" or "access"');
+        if ('request' != $token_type && 'access' != $token_type) {
+            throw new OAuthException2('Unknown token type "' . $token_type . '", must be either "request" or "access"');
         }
 
         // Maximum time to live for this token
         if (isset($options['token_ttl']) && is_numeric($options['token_ttl'])) {
-            $ttl = intval($options['token_ttl']);
-        } elseif ($token_type == 'request') {
-            $ttl = intval($this->max_request_token_ttl);
+            $ttl = (int) $options['token_ttl'];
+        } elseif ('request' == $token_type) {
+            $ttl = (int) $this->max_request_token_ttl;
         } else {
             $ttl = null;
         }
 
-
         // Named tokens, unique per user/consumer key
-        if (isset($options['name']) && $options['name'] != '') {
+        if (isset($options['name']) && '' != $options['name']) {
             $name = $options['name'];
         } else {
             $name = '';
         }
-        //
-        $sql = "BEGIN SP_ADD_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID, :P_NAME, :P_TOKEN_TYPE, :P_TOKEN, :P_TOKEN_SECRET, :P_TOKEN_INTERVAL_IN_SEC, :P_RESULT); END;";
+
+        $sql = 'BEGIN SP_ADD_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID, :P_NAME, :P_TOKEN_TYPE, :P_TOKEN, :P_TOKEN_SECRET, :P_TOKEN_INTERVAL_IN_SEC, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -337,30 +370,27 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_TOKEN_INTERVAL_IN_SEC', $ttl, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
-        //
 
-
-        if (! $result) {
-            throw new OAuthException2('Received duplicate token "'.$token.'" for the same consumer_key "'.$consumer_key.'"');
+        if (!$result) {
+            throw new OAuthException2('Received duplicate token "' . $token . '" for the same consumer_key "' . $consumer_key . '"');
         }
     }
-
 
     /**
      * Delete a server key.  This removes access to that site.
      *
      * @param string consumer_key
      * @param int user_id    user registering this server
-     * @param boolean user_is_admin
+     * @param bool user_is_admin
      */
     public function deleteServer($consumer_key, $user_id, $user_is_admin = false)
     {
-        $sql = "BEGIN SP_DELETE_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_USER_IS_ADMIN, :P_RESULT); END;";
+        $sql = 'BEGIN SP_DELETE_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -368,58 +398,57 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_USER_IS_ADMIN', $user_is_admin, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
     }
-
 
     /**
      * Get a server from the consumer registry using the consumer key
      *
      * @param string consumer_key
      * @param int user_id
-     * @param boolean user_is_admin (optional)
+     * @param bool user_is_admin (optional)
+     *
      * @exception OAuthException2 when server is not found
+     *
      * @return array
      */
     public function getServer($consumer_key, $user_id, $user_is_admin = false)
     {
-        //
-        $sql = "BEGIN SP_GET_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
         oci_execute($p_row, OCI_DEFAULT);
         oci_fetch_all($p_row, $getServerList, null, null, OCI_FETCHSTATEMENT_BY_ROW);
         $r = $getServerList;
-        //
+
         if (empty($r)) {
-            throw new OAuthException2('No server with consumer_key "'.$consumer_key.'" has been registered (for this user)');
+            throw new OAuthException2('No server with consumer_key "' . $consumer_key . '" has been registered (for this user)');
         }
 
-        if (isset($r['signature_methods']) && ! empty($r['signature_methods'])) {
+        if (isset($r['signature_methods']) && !empty($r['signature_methods'])) {
             $r['signature_methods'] = explode(',', $r['signature_methods']);
         } else {
-            $r['signature_methods'] = array();
+            $r['signature_methods'] = [];
         }
 
         return $r;
     }
-
 
     /**
      * Find the server details that might be used for a request
@@ -428,7 +457,9 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      *
      * @param string uri    uri of the server
      * @param int user_id    id of the logged on user
+     *
      * @exception OAuthException2 when no credentials found
+     *
      * @return array
      */
     public function getServerForUri($uri, $user_id)
@@ -438,16 +469,14 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $host = isset($ps['host']) ? $ps['host'] : 'localhost';
         $path = isset($ps['path']) ? $ps['path'] : '';
 
-        if (empty($path) || substr($path, -1) != '/') {
+        if (empty($path) || '/' != substr($path, -1)) {
             $path .= '/';
         }
 
-
-        //
-        $sql = "BEGIN SP_GET_SERVER_FOR_URI(:P_HOST, :P_PATH,:P_USER_ID, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_SERVER_FOR_URI(:P_HOST, :P_PATH,:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_HOST', $host, 255);
@@ -455,49 +484,49 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
         oci_execute($p_row, OCI_DEFAULT);
         oci_fetch_all($p_row, $getServerForUriList, null, null, OCI_FETCHSTATEMENT_BY_ROW);
         $server = $getServerForUriList;
-        //
+
         if (empty($server)) {
-            throw new OAuthException2('No server available for '.$uri);
+            throw new OAuthException2('No server available for ' . $uri);
         }
         $server['signature_methods'] = explode(',', $server['signature_methods']);
 
         return $server;
     }
 
-
     /**
      * Get a list of all server token this user has access to.
      *
      * @param int usr_id
+     *
      * @return array
      */
     public function listServerTokens($user_id)
     {
-        $sql = "BEGIN SP_LIST_SERVER_TOKENS(:P_USER_ID, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_LIST_SERVER_TOKENS(:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -508,34 +537,31 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         return $ts;
     }
 
-
     /**
      * Count how many tokens we have for the given server
      *
      * @param string consumer_key
+     *
      * @return int
      */
     public function countServerTokens($consumer_key)
     {
-        //
         $count = 0;
-        $sql = "BEGIN SP_COUNT_SERVICE_TOKENS(:P_CONSUMER_KEY, :P_COUNT, :P_RESULT); END;";
+        $sql = 'BEGIN SP_COUNT_SERVICE_TOKENS(:P_CONSUMER_KEY, :P_COUNT, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
         oci_bind_by_name($stmt, ':P_COUNT', $count, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
-        //
         return $count;
     }
-
 
     /**
      * Get a specific server token for the given user
@@ -543,15 +569,17 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      * @param string consumer_key
      * @param string token
      * @param int user_id
+     *
      * @exception OAuthException2 when no such token found
+     *
      * @return array
      */
     public function getServerToken($consumer_key, $token, $user_id)
     {
-        $sql = "BEGIN SP_GET_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID,:P_TOKEN, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID,:P_TOKEN, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -559,26 +587,24 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
         oci_execute($p_row, OCI_DEFAULT);
         oci_fetch_all($p_row, $getServerTokenList, null, null, OCI_FETCHSTATEMENT_BY_ROW);
         $ts = $getServerTokenList;
-        //
 
         if (empty($ts)) {
-            throw new OAuthException2('No such consumer key ('.$consumer_key.') and token ('.$token.') combination for user "'.$user_id.'"');
+            throw new OAuthException2('No such consumer key (' . $consumer_key . ') and token (' . $token . ') combination for user "' . $user_id . '"');
         }
 
         return $ts;
     }
-
 
     /**
      * Delete a token we obtained from a server.
@@ -586,15 +612,14 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      * @param string consumer_key
      * @param string token
      * @param int user_id
-     * @param boolean user_is_admin
+     * @param bool user_is_admin
      */
     public function deleteServerToken($consumer_key, $token, $user_id, $user_is_admin = false)
     {
-        //
-        $sql = "BEGIN SP_DELETE_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID,:P_TOKEN, :P_USER_IS_ADMIN, :P_RESULT); END;";
+        $sql = 'BEGIN SP_DELETE_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID,:P_TOKEN, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -603,11 +628,9 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_USER_IS_ADMIN', $user_is_admin, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
-        //
     }
-
 
     /**
      * Set the ttl of a server access token.  This is done when the
@@ -619,17 +642,16 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      */
     public function setServerTokenTtl($consumer_key, $token, $token_ttl)
     {
-        if ($token_ttl <= 0) {
+        if (0 >= $token_ttl) {
             // Immediate delete when the token is past its ttl
             $this->deleteServerToken($consumer_key, $token, 0, true);
         } else {
             // Set maximum time to live for this token
 
-            //
-            $sql = "BEGIN SP_SET_SERVER_TOKEN_TTL(:P_TOKEN_TTL, :P_CONSUMER_KEY, :P_TOKEN, :P_RESULT); END;";
+            $sql = 'BEGIN SP_SET_SERVER_TOKEN_TTL(:P_TOKEN_TTL, :P_CONSUMER_KEY, :P_TOKEN, :P_RESULT); END;';
 
             // parse sql
-            $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+            $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
             // Bind In and Out Variables
             oci_bind_by_name($stmt, ':P_TOKEN_TTL', $token_ttl, 40);
@@ -637,12 +659,10 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
             oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
             oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-            //Execute the statement
+            // Execute the statement
             oci_execute($stmt);
-            //
         }
     }
-
 
     /**
      * Get a list of all consumers from the consumer registry.
@@ -650,30 +670,29 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      *
      * @param string q    query term
      * @param int user_id
+     *
      * @return array
      */
     public function listServers($q = '', $user_id)
     {
         $q = trim(str_replace('%', '', $q));
-        $args = array();
+        $args = [];
 
-
-        //
-        $sql = "BEGIN SP_LIST_SERVERS(:P_Q, :P_USER_ID, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_LIST_SERVERS(:P_Q, :P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_Q', $q, 255);
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -681,11 +700,8 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_fetch_all($p_row, $listServersList, null, null, OCI_FETCHSTATEMENT_BY_ROW);
         $servers = $listServersList;
 
-        //
-
         return $servers;
     }
-
 
     /**
      * Register or update a server for our site (we will be the consumer)
@@ -694,15 +710,17 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      *
      * @param array server
      * @param int user_id    user registering this server
-     * @param boolean user_is_admin
+     * @param bool user_is_admin
+     *
      * @exception OAuthException2 when fields are missing or on duplicate consumer_key
+     *
      * @return consumer_key
      */
     public function updateServer($server, $user_id, $user_is_admin = false)
     {
-        foreach (array('consumer_key', 'server_uri') as $f) {
+        foreach (['consumer_key', 'server_uri'] as $f) {
             if (empty($server[$f])) {
-                throw new OAuthException2('The field "'.$f.'" must be set and non empty');
+                throw new OAuthException2('The field "' . $f . '" must be set and non empty');
             }
         }
         $parts = parse_url($server['server_uri']);
@@ -721,7 +739,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
             $flag = 1;
         }
         if ($flag) {
-            if (is_null($server['user_id'])) {
+            if (null === $server['user_id']) {
                 $ocr_usa_id_ref = null;
             } else {
                 $ocr_usa_id_ref = $server['user_id'];
@@ -730,14 +748,14 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
             $flag = 0;
             $ocr_usa_id_ref = $user_id;
         }
-        //sp
-        $sql = "BEGIN SP_UPDATE_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_OCR_ID, :P_USER_IS_ADMIN,
+        // sp
+        $sql = 'BEGIN SP_UPDATE_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_OCR_ID, :P_USER_IS_ADMIN,
                  :P_OCR_CONSUMER_SECRET, :P_OCR_SERVER_URI, :P_OCR_SERVER_URI_HOST, :P_OCR_SERVER_URI_PATH,
                  :P_OCR_REQUEST_TOKEN_URI, :P_OCR_AUTHORIZE_URI, :P_OCR_ACCESS_TOKEN_URI, :P_OCR_SIGNATURE_METHODS,
-                 :P_OCR_USA_ID_REF, :P_UPDATE_P_OCR_USA_ID_REF_FLAG, :P_RESULT); END;";
+                 :P_OCR_USA_ID_REF, :P_UPDATE_P_OCR_USA_ID_REF_FLAG, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
         $server['request_token_uri'] = isset($server['request_token_uri']) ? $server['request_token_uri'] : '';
         $server['authorize_uri'] = isset($server['authorize_uri']) ? $server['authorize_uri'] : '';
         $server['access_token_uri'] = isset($server['access_token_uri']) ? $server['access_token_uri'] : '';
@@ -758,7 +776,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_UPDATE_P_OCR_USA_ID_REF_FLAG', $flag, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         return $server['consumer_key'];
@@ -775,7 +793,8 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      *
      * @param array consumer
      * @param int user_id    user registering this consumer
-     * @param boolean user_is_admin
+     * @param bool user_is_admin
+     *
      * @return string consumer key
      */
     public function updateConsumer($consumer, $user_id, $user_is_admin = false)
@@ -791,12 +810,11 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $consumer['application_type'] = isset($consumer['application_type']) ? $consumer['application_type'] : '';
         $consumer['application_commercial'] = isset($consumer['application_commercial']) ? $consumer['application_commercial'] : 0;
 
-        //sp
-        $sql = "BEGIN SP_UPDATE_CONSUMER(:P_OSR_USA_ID_REF, :P_OSR_CONSUMER_KEY, :P_OSR_CONSUMER_SECRET, :P_OSR_REQUESTER_NAME, :P_OSR_REQUESTER_EMAIL, :P_OSR_CALLBACK_URI, :P_OSR_APPLICATION_URI, :P_OSR_APPLICATION_TITLE  , :P_OSR_APPLICATION_DESCR, :P_OSR_APPLICATION_NOTES, :P_OSR_APPLICATION_TYPE, :P_OSR_APPLICATION_COMMERCIAL, :P_RESULT); END;";
+        // sp
+        $sql = 'BEGIN SP_UPDATE_CONSUMER(:P_OSR_USA_ID_REF, :P_OSR_CONSUMER_KEY, :P_OSR_CONSUMER_SECRET, :P_OSR_REQUESTER_NAME, :P_OSR_REQUESTER_EMAIL, :P_OSR_CALLBACK_URI, :P_OSR_APPLICATION_URI, :P_OSR_APPLICATION_TITLE  , :P_OSR_APPLICATION_DESCR, :P_OSR_APPLICATION_NOTES, :P_OSR_APPLICATION_TYPE, :P_OSR_APPLICATION_COMMERCIAL, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
-
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_OSR_USA_ID_REF', $user_id, 40);
@@ -813,28 +831,26 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_OSR_APPLICATION_COMMERCIAL', $consumer['application_commercial'], 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
         echo $result;
 
         return $consumer_key;
     }
 
-
     /**
      * Delete a consumer key.  This removes access to our site for all applications using this key.
      *
      * @param string consumer_key
      * @param int user_id    user registering this server
-     * @param boolean user_is_admin
+     * @param bool user_is_admin
      */
     public function deleteConsumer($consumer_key, $user_id, $user_is_admin = false)
     {
-        //
-        $sql = "BEGIN SP_DELETE_CONSUMER(:P_CONSUMER_KEY, :P_USER_ID, :P_USER_IS_ADMIN, :P_RESULT); END;";
+        $sql = 'BEGIN SP_DELETE_CONSUMER(:P_CONSUMER_KEY, :P_USER_ID, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -842,37 +858,37 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_USER_IS_ADMIN', $user_is_admin, 40);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
-        //
     }
-
 
     /**
      * Fetch a consumer of this server, by consumer_key.
      *
      * @param string consumer_key
      * @param int user_id
-     * @param boolean user_is_admin (optional)
+     * @param bool user_is_admin (optional)
+     *
      * @exception OAuthException2 when consumer not found
+     *
      * @return array
      */
     public function getConsumer($consumer_key, $user_id, $user_is_admin = false)
     {
-        $sql = "BEGIN SP_GET_CONSUMER(:P_CONSUMER_KEY, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_CONSUMER(:P_CONSUMER_KEY, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -881,23 +897,22 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
 
         $consumer = $getConsumerList;
 
-        if (! is_array($consumer)) {
-            throw new OAuthException2('No consumer with consumer_key "'.$consumer_key.'"');
+        if (!is_array($consumer)) {
+            throw new OAuthException2('No consumer with consumer_key "' . $consumer_key . '"');
         }
 
-        $c = array();
+        $c = [];
         foreach ($consumer as $key => $value) {
             $c[substr($key, 4)] = $value;
         }
         $c['user_id'] = $c['usa_id_ref'];
 
-        if (! $user_is_admin && ! empty($c['user_id']) && $c['user_id'] != $user_id) {
-            throw new OAuthException2('No access to the consumer information for consumer_key "'.$consumer_key.'"');
+        if (!$user_is_admin && !empty($c['user_id']) && $c['user_id'] != $user_id) {
+            throw new OAuthException2('No access to the consumer information for consumer_key "' . $consumer_key . '"');
         }
 
         return $c;
     }
-
 
     /**
      * Fetch the static consumer key for this provider.  The user for the static consumer
@@ -907,34 +922,32 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      */
     public function getConsumerStatic()
     {
-        //
-        $sql = "BEGIN SP_GET_CONSUMER_STATIC_SELECT(:P_OSR_CONSUMER_KEY, :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_CONSUMER_STATIC_SELECT(:P_OSR_CONSUMER_KEY, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_OSR_CONSUMER_KEY', $consumer, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         if (empty($consumer)) {
-            $consumer_key = 'sc-'.$this->generateKey(true);
+            $consumer_key = 'sc-' . $this->generateKey(true);
 
-            $sql = "BEGIN SP_CONSUMER_STATIC_SAVE(:P_OSR_CONSUMER_KEY, :P_RESULT); END;";
+            $sql = 'BEGIN SP_CONSUMER_STATIC_SAVE(:P_OSR_CONSUMER_KEY, :P_RESULT); END;';
 
             // parse sql
-            $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+            $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
             // Bind In and Out Variables
             oci_bind_by_name($stmt, ':P_OSR_CONSUMER_KEY', $consumer_key, 255);
             oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-            //Execute the statement
+            // Execute the statement
             oci_execute($stmt);
-
 
             // Just make sure that if the consumer key is truncated that we get the truncated string
             $consumer = $consumer_key;
@@ -943,35 +956,34 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         return $consumer;
     }
 
-
     /**
      * Add an unautorized request token to our server.
      *
      * @param string consumer_key
      * @param array options        (eg. token_ttl)
+     *
      * @return array (token, token_secret)
      */
-    public function addConsumerRequestToken($consumer_key, $options = array())
+    public function addConsumerRequestToken($consumer_key, $options = [])
     {
         $token = $this->generateKey(true);
         $secret = $this->generateKey();
 
-
         if (isset($options['token_ttl']) && is_numeric($options['token_ttl'])) {
-            $ttl = intval($options['token_ttl']);
+            $ttl = (int) $options['token_ttl'];
         } else {
             $ttl = $this->max_request_token_ttl;
         }
 
-        if (! isset($options['oauth_callback'])) {
+        if (!isset($options['oauth_callback'])) {
             // 1.0a Compatibility : store callback url associated with request token
             $options['oauth_callback'] = 'oob';
         }
         $options_oauth_callback = $options['oauth_callback'];
-        $sql = "BEGIN SP_ADD_CONSUMER_REQUEST_TOKEN(:P_TOKEN_TTL, :P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_SECRET, :P_CALLBACK_URL, :P_RESULT); END;";
+        $sql = 'BEGIN SP_ADD_CONSUMER_REQUEST_TOKEN(:P_TOKEN_TTL, :P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_SECRET, :P_CALLBACK_URL, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN_TTL', $ttl, 20);
@@ -981,38 +993,37 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_CALLBACK_URL', $options_oauth_callback, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
-
-        $returnArray = array('token' => $token, 'token_secret' => $secret, 'token_ttl' => $ttl);
+        $returnArray = ['token' => $token, 'token_secret' => $secret, 'token_ttl' => $ttl];
 
         return $returnArray;
     }
-
 
     /**
      * Fetch the consumer request token, by request token.
      *
      * @param string token
-     * @return array  token and consumer details
+     *
+     * @return array token and consumer details
      */
     public function getConsumerRequestToken($token)
     {
-        $sql = "BEGIN SP_GET_CONSUMER_REQUEST_TOKEN(:P_TOKEN, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_CONSUMER_REQUEST_TOKEN(:P_TOKEN, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -1023,7 +1034,6 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         return $rs[0];
     }
 
-
     /**
      * Delete a consumer token.  The token must be a request or authorized token.
      *
@@ -1031,19 +1041,18 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      */
     public function deleteConsumerRequestToken($token)
     {
-        $sql = "BEGIN SP_DEL_CONSUMER_REQUEST_TOKEN(:P_TOKEN, :P_RESULT); END;";
+        $sql = 'BEGIN SP_DEL_CONSUMER_REQUEST_TOKEN(:P_TOKEN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
     }
-
 
     /**
      * Upgrade a request token to be an authorized request token.
@@ -1057,10 +1066,10 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         // 1.0a Compatibility : create a token verifier
         $verifier = substr(md5(rand()), 0, 10);
 
-        $sql = "BEGIN SP_AUTH_CONSUMER_REQ_TOKEN(:P_USER_ID, :P_REFERRER_HOST, :P_VERIFIER, :P_TOKEN, :P_RESULT); END;";
+        $sql = 'BEGIN SP_AUTH_CONSUMER_REQ_TOKEN(:P_USER_ID, :P_REFERRER_HOST, :P_VERIFIER, :P_TOKEN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
@@ -1069,18 +1078,17 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         return $verifier;
     }
 
-
     /**
      * Count the consumer access tokens for the given consumer.
      *
      * @param string consumer_key
+     *
      * @return int
      */
     public function countConsumerAccessTokens($consumer_key)
@@ -1095,41 +1103,41 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
                       AND ost_token_ttl    >= NOW()
                     ', $consumer_key);
         */
-        $sql = "BEGIN SP_COUNT_CONSUMER_ACCESS_TOKEN(:P_CONSUMER_KEY, :P_COUNT, :P_RESULT); END;";
+        $sql = 'BEGIN SP_COUNT_CONSUMER_ACCESS_TOKEN(:P_CONSUMER_KEY, :P_COUNT, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
         oci_bind_by_name($stmt, ':P_COUNT', $count, 20);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         return $count;
     }
-
 
     /**
      * Exchange an authorized request token for new access token.
      *
      * @param string token
      * @param array options        options for the token, token_ttl
+     *
      * @exception OAuthException2 when token could not be exchanged
+     *
      * @return array (token, token_secret)
      */
-    public function exchangeConsumerRequestForAccessToken($token, $options = array())
+    public function exchangeConsumerRequestForAccessToken($token, $options = [])
     {
         $new_token = $this->generateKey(true);
         $new_secret = $this->generateKey();
 
-        $sql = "BEGIN SP_EXCH_CONS_REQ_FOR_ACC_TOKEN(:P_TOKEN_TTL, :P_NEW_TOKEN, :P_TOKEN, :P_TOKEN_SECRET, :P_VERIFIER, :P_OUT_TOKEN_TTL, :P_RESULT); END;";
+        $sql = 'BEGIN SP_EXCH_CONS_REQ_FOR_ACC_TOKEN(:P_TOKEN_TTL, :P_NEW_TOKEN, :P_TOKEN, :P_TOKEN_SECRET, :P_VERIFIER, :P_OUT_TOKEN_TTL, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN_TTL', $options['token_ttl'], 255);
@@ -1140,63 +1148,62 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_OUT_TOKEN_TTL', $ttl, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
-        $ret = array('token' => $new_token, 'token_secret' => $new_secret);
+        $ret = ['token' => $new_token, 'token_secret' => $new_secret];
         if (is_numeric($ttl)) {
-            $ret['token_ttl'] = intval($ttl);
+            $ret['token_ttl'] = (int) $ttl;
         }
 
         return $ret;
     }
-
 
     /**
      * Fetch the consumer access token, by access token.
      *
      * @param string token
      * @param int user_id
+     *
      * @exception OAuthException2 when token is not found
-     * @return array  token and consumer details
+     *
+     * @return array token and consumer details
      */
     public function getConsumerAccessToken($token, $user_id)
     {
-        $sql = "BEGIN SP_GET_CONSUMER_ACCESS_TOKEN(:P_USER_ID, :P_TOKEN, :P_ROWS :P_RESULT); END;";
+        $sql = 'BEGIN SP_GET_CONSUMER_ACCESS_TOKEN(:P_USER_ID, :P_TOKEN, :P_ROWS :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
         oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
         oci_execute($p_row, OCI_DEFAULT);
         oci_fetch_all($p_row, $rs, null, null, OCI_FETCHSTATEMENT_BY_ROW);
         if (empty($rs)) {
-            throw new OAuthException2('No server_token "'.$token.'" for user "'.$user_id.'"');
+            throw new OAuthException2('No server_token "' . $token . '" for user "' . $user_id . '"');
         }
 
         return $rs;
     }
-
 
     /**
      * Delete a consumer access token.
      *
      * @param string token
      * @param int user_id
-     * @param boolean user_is_admin
+     * @param bool user_is_admin
      */
     public function deleteConsumerAccessToken($token, $user_id, $user_is_admin = false)
     {
@@ -1217,10 +1224,10 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
                           AND ost_usa_id_ref = %d
                         ', $token, $user_id);
         }*/
-        $sql = "BEGIN SP_DEL_CONSUMER_ACCESS_TOKEN(:P_USER_ID, :P_TOKEN, :P_USER_IS_ADMIN, :P_RESULT); END;";
+        $sql = 'BEGIN SP_DEL_CONSUMER_ACCESS_TOKEN(:P_USER_ID, :P_TOKEN, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
@@ -1228,11 +1235,9 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_USER_IS_ADMIN', $user_is_admin, 20);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
     }
-
 
     /**
      * Set the ttl of a consumer access token.  This is done when the
@@ -1243,53 +1248,51 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      */
     public function setConsumerAccessTokenTtl($token, $token_ttl)
     {
-        if ($token_ttl <= 0) {
+        if (0 >= $token_ttl) {
             // Immediate delete when the token is past its ttl
             $this->deleteConsumerAccessToken($token, 0, true);
         } else {
             // Set maximum time to live for this token
 
-
-            $sql = "BEGIN SP_SET_CONSUMER_ACC_TOKEN_TTL(:P_TOKEN, :P_TOKEN_TTL, :P_RESULT); END;";
+            $sql = 'BEGIN SP_SET_CONSUMER_ACC_TOKEN_TTL(:P_TOKEN, :P_TOKEN_TTL, :P_RESULT); END;';
 
             // parse sql
-            $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+            $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
             // Bind In and Out Variables
             oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
             oci_bind_by_name($stmt, ':P_TOKEN_TTL', $token_ttl, 20);
             oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-
-            //Execute the statement
+            // Execute the statement
             oci_execute($stmt);
         }
     }
-
 
     /**
      * Fetch a list of all consumer keys, secrets etc.
      * Returns the public (user_id is null) and the keys owned by the user
      *
      * @param int user_id
+     *
      * @return array
      */
     public function listConsumers($user_id)
     {
-        $sql = "BEGIN SP_LIST_CONSUMERS(:P_USER_ID, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_LIST_CONSUMERS(:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -1305,36 +1308,38 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      *
      * @param int $begin
      * @param int $total
+     *
      * @return array
      */
     public function listConsumerApplications($begin = 0, $total = 25)
     {
         // TODO
-        return array();
+        return [];
     }
 
     /**
      * Fetch a list of all consumer tokens accessing the account of the given user.
      *
      * @param int user_id
+     *
      * @return array
      */
     public function listConsumerTokens($user_id)
     {
-        $sql = "BEGIN SP_LIST_CONSUMER_TOKENS(:P_USER_ID, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_LIST_CONSUMER_TOKENS(:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -1344,7 +1349,6 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         return $rs;
     }
 
-
     /**
      * Check an nonce/timestamp combination.  Clears any nonce combinations
      * that are older than the one received.
@@ -1353,14 +1357,15 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      * @param string    token
      * @param int        timestamp
      * @param string    nonce
+     *
      * @exception OAuthException2    thrown when the timestamp is not in sequence or nonce is not unique
      */
     public function checkServerNonce($consumer_key, $token, $timestamp, $nonce)
     {
-        $sql = "BEGIN SP_CHECK_SERVER_NONCE(:P_CONSUMER_KEY, :P_TOKEN, :P_TIMESTAMP, :P_MAX_TIMESTAMP_SKEW, :P_NONCE, :P_RESULT); END;";
+        $sql = 'BEGIN SP_CHECK_SERVER_NONCE(:P_CONSUMER_KEY, :P_TOKEN, :P_TIMESTAMP, :P_MAX_TIMESTAMP_SKEW, :P_NONCE, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -1370,11 +1375,9 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_NONCE', $nonce, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
     }
-
 
     /**
      * Add an entry to the log table
@@ -1388,16 +1391,16 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      */
     public function addLog($keys, $received, $sent, $base_string, $notes, $user_id = null)
     {
-        $args = array();
-        $ps = array();
+        $args = [];
+        $ps = [];
         foreach ($keys as $key => $value) {
             $args[] = $value;
             $ps[] = "olg_$key = '%s'";
         }
 
-        if (! empty($_SERVER['REMOTE_ADDR'])) {
+        if (!empty($_SERVER['REMOTE_ADDR'])) {
             $remote_ip = $_SERVER['REMOTE_ADDR'];
-        } elseif (! empty($_SERVER['REMOTE_IP'])) {
+        } elseif (!empty($_SERVER['REMOTE_IP'])) {
             $remote_ip = $_SERVER['REMOTE_IP'];
         } else {
             $remote_ip = '0.0.0.0';
@@ -1411,11 +1414,10 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $olg_usa_id_ref = $user_id;
         $olg_remote_ip = $remote_ip;
 
-
-        $sql = "BEGIN SP_ADD_LOG(:P_RECEIVED, :P_SENT, :P_BASE_STRING, :P_NOTES, :P_USA_ID_REF, :P_REMOTE_IP, :P_RESULT); END;";
+        $sql = 'BEGIN SP_ADD_LOG(:P_RECEIVED, :P_SENT, :P_BASE_STRING, :P_NOTES, :P_USA_ID_REF, :P_REMOTE_IP, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_RECEIVED', $olg_received, 255);
@@ -1426,11 +1428,9 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_REMOTE_IP', $olg_remote_ip, 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
     }
-
 
     /**
      * Get a page of entries from the log.  Returns the last 100 records
@@ -1438,6 +1438,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      *
      * @param array options
      * @param int user_id    current user
+     *
      * @return array log records
      */
     public function listLog($options, $user_id)
@@ -1448,10 +1449,10 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
             $optionsFlag = 1;
         }
 
-        $sql = "BEGIN SP_LIST_LOG(:P_OPTION_FLAG, :P_USA_ID, :P_OSR_CONSUMER_KEY, :P_OCR_CONSUMER_KEY, :P_OST_TOKEN, :P_OCT_TOKEN, :P_ROWS, :P_RESULT); END;";
+        $sql = 'BEGIN SP_LIST_LOG(:P_OPTION_FLAG, :P_USA_ID, :P_OSR_CONSUMER_KEY, :P_OCR_CONSUMER_KEY, :P_OST_TOKEN, :P_OCT_TOKEN, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) or die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_OPTION_FLAG', $optionsFlag, 255);
@@ -1462,11 +1463,11 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         oci_bind_by_name($stmt, ':P_OCT_TOKEN', $options['oct_token'], 255);
         oci_bind_by_name($stmt, ':P_RESULT', $result, 20);
 
-        //Bind the ref cursor
+        // Bind the ref cursor
         $p_row = oci_new_cursor($this->conn);
         oci_bind_by_name($stmt, ':P_ROWS', $p_row, -1, OCI_B_CURSOR);
 
-        //Execute the statement
+        // Execute the statement
         oci_execute($stmt);
 
         // treat the ref cursor as a statement resource
@@ -1481,9 +1482,8 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
      */
     public function install()
     {
-        require_once dirname(__FILE__).'/oracle/install.php';
+        require_once dirname(__FILE__) . '/oracle/install.php';
     }
 }
-
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */

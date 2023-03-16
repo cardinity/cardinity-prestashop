@@ -1,17 +1,48 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Handle the discovery of OAuth service provider endpoints and static consumer identity.
  *
  * @version $Id$
+ *
  * @author Marc Worrell <marcw@pobox.com>
+ *
  * @date  Sep 4, 2008 5:05:19 PM
  *
  * The MIT License
@@ -36,12 +67,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+require_once dirname(__FILE__) . '/discovery/xrds_parse.php';
 
-require_once dirname(__FILE__).'/discovery/xrds_parse.php';
-
-require_once dirname(__FILE__).'/OAuthException2.php';
-require_once dirname(__FILE__).'/OAuthRequestLogger.php';
-
+require_once dirname(__FILE__) . '/OAuthException2.php';
+require_once dirname(__FILE__) . '/OAuthRequestLogger.php';
 
 class OAuthDiscovery
 {
@@ -52,46 +81,46 @@ class OAuthDiscovery
      * See also: http://oauth.net/discovery/#consumer_identity_types
      *
      * @param string uri
-     * @return array        provider description
+     *
+     * @return array provider description
      */
     public static function discover($uri)
     {
         // See what kind of consumer allocations are available
         $xrds_file = self::discoverXRDS($uri);
-        if (! empty($xrds_file)) {
+        if (!empty($xrds_file)) {
             $xrds = xrds_parse($xrds_file);
             if (empty($xrds)) {
-                throw new OAuthException2('Could not discover OAuth information for '.$uri);
+                throw new OAuthException2('Could not discover OAuth information for ' . $uri);
             }
         } else {
-            throw new OAuthException2('Could not discover XRDS file at '.$uri);
+            throw new OAuthException2('Could not discover XRDS file at ' . $uri);
         }
 
         // Fill an OAuthServer record for the uri found
         $ps = parse_url($uri);
         $host = isset($ps['host']) ? $ps['host'] : 'localhost';
-        $server_uri = $ps['scheme'].'://'.$host.'/';
+        $server_uri = $ps['scheme'] . '://' . $host . '/';
 
-        $p = array(
-            'user_id'           => null,
-            'consumer_key'      => '',
-            'consumer_secret'   => '',
+        $p = [
+            'user_id' => null,
+            'consumer_key' => '',
+            'consumer_secret' => '',
             'signature_methods' => '',
-            'server_uri'        => $server_uri,
+            'server_uri' => $server_uri,
             'request_token_uri' => '',
-            'authorize_uri'     => '',
-            'access_token_uri'  => ''
-        );
-
+            'authorize_uri' => '',
+            'access_token_uri' => '',
+        ];
 
         // Consumer identity (out of bounds or static)
         if (isset($xrds['consumer_identity'])) {
             // Try to find a static consumer allocation, we like those :)
             foreach ($xrds['consumer_identity'] as $ci) {
-                if ($ci['method'] == 'static' && ! empty($ci['consumer_key'])) {
+                if ('static' == $ci['method'] && !empty($ci['consumer_key'])) {
                     $p['consumer_key'] = $ci['consumer_key'];
                     $p['consumer_secret'] = '';
-                } elseif ($ci['method'] == 'oob' && ! empty($ci['uri'])) {
+                } elseif ('oob' == $ci['method'] && !empty($ci['uri'])) {
                     // TODO: Keep this uri somewhere for the user?
                     $p['consumer_oob_uri'] = $ci['uri'];
                 }
@@ -101,19 +130,19 @@ class OAuthDiscovery
         // The token uris
         if (isset($xrds['request'][0]['uri'])) {
             $p['request_token_uri'] = $xrds['request'][0]['uri'];
-            if (! empty($xrds['request'][0]['signature_method'])) {
+            if (!empty($xrds['request'][0]['signature_method'])) {
                 $p['signature_methods'] = $xrds['request'][0]['signature_method'];
             }
         }
         if (isset($xrds['authorize'][0]['uri'])) {
             $p['authorize_uri'] = $xrds['authorize'][0]['uri'];
-            if (! empty($xrds['authorize'][0]['signature_method'])) {
+            if (!empty($xrds['authorize'][0]['signature_method'])) {
                 $p['signature_methods'] = $xrds['authorize'][0]['signature_method'];
             }
         }
         if (isset($xrds['access'][0]['uri'])) {
             $p['access_token_uri'] = $xrds['access'][0]['uri'];
-            if (! empty($xrds['access'][0]['signature_method'])) {
+            if (!empty($xrds['access'][0]['signature_method'])) {
                 $p['signature_methods'] = $xrds['access'][0]['signature_method'];
             }
         }
@@ -121,18 +150,18 @@ class OAuthDiscovery
         return $p;
     }
 
-
     /**
      * Discover the XRDS file at the uri.  This is a bit primitive, you should overrule
      * this function so that the XRDS file can be cached for later referral.
      *
      * @param string uri
-     * @return string        false when no XRDS file found
+     *
+     * @return string false when no XRDS file found
      */
     protected static function discoverXRDS($uri, $recur = 0)
     {
         // Bail out when we are following redirects
-        if ($recur > 10) {
+        if (10 < $recur) {
             return false;
         }
 
@@ -142,7 +171,7 @@ class OAuthDiscovery
         // 1. The XRDS discovery file itself (check content-type)
         // 2. The X-XRDS-Location header
 
-        if (is_string($data) && ! empty($data)) {
+        if (is_string($data) && !empty($data)) {
             list($head, $body) = explode("\r\n\r\n", $data);
             $body = trim($body);
             $m = false;
@@ -174,18 +203,18 @@ class OAuthDiscovery
         return $xrds;
     }
 
-
     /**
      * Try to fetch an XRDS file at the given location.  Sends an accept header preferring the xrds file.
      *
      * @param string uri
-     * @return array    (head,body), false on an error
+     *
+     * @return array (head,body), false on an error
      */
     protected static function curl($uri)
     {
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/xrds+xml, */*;q=0.1'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/xrds+xml, */*;q=0.1']);
         curl_setopt($ch, CURLOPT_USERAGENT, 'anyMeta/OAuth 1.0 - (OAuth Discovery $LastChangedRevision: 45 $)');
         curl_setopt($ch, CURLOPT_URL, $uri);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -197,12 +226,11 @@ class OAuthDiscovery
 
         // Tell the logger what we requested and what we received back
         $data = "GET $uri";
-        OAuthRequestLogger::setSent($data, "");
+        OAuthRequestLogger::setSent($data, '');
         OAuthRequestLogger::setReceived($txt);
 
         return $txt;
     }
 }
-
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */

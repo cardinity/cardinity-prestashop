@@ -1,20 +1,50 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Verify the current request.  Checks if signed and if the signature is correct.
  * When correct then also figures out on behalf of which user this request is being made.
  *
  * @version $Id: OAuthRequestVerifier.php 155 2010-09-10 18:38:33Z brunobg@corollarium.com $
- * @author Marc Worrell <marcw@pobox.com>
- * @date  Nov 16, 2007 4:35:03 PM
  *
+ * @author Marc Worrell <marcw@pobox.com>
+ *
+ * @date  Nov 16, 2007 4:35:03 PM
  *
  * The MIT License
  *
@@ -38,10 +68,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-require_once dirname(__FILE__).'/OAuthStore.php';
-require_once dirname(__FILE__).'/OAuthRequest.php';
-
+require_once dirname(__FILE__) . '/OAuthStore.php';
+require_once dirname(__FILE__) . '/OAuthRequest.php';
 
 class OAuthRequestVerifier extends OAuthRequest
 {
@@ -59,9 +87,9 @@ class OAuthRequestVerifier extends OAuthRequest
     public function __construct($uri = null, $method = null, $params = null)
     {
         if ($params) {
-            $encodedParams = array();
+            $encodedParams = [];
             foreach ($params as $key => $value) {
-                if (preg_match("/^oauth_/", $key)) {
+                if (preg_match('/^oauth_/', $key)) {
                     continue;
                 }
                 $encodedParams[rawurlencode($key)] = rawurlencode($value);
@@ -75,11 +103,10 @@ class OAuthRequestVerifier extends OAuthRequest
         OAuthRequestLogger::start($this);
     }
 
-
     /**
      * See if the current request is signed with OAuth
      *
-     * @return boolean
+     * @return bool
      */
     public static function requestIsSigned()
     {
@@ -87,7 +114,7 @@ class OAuthRequestVerifier extends OAuthRequest
             $signed = true;
         } else {
             $hs = OAuthRequestLogger::getAllHeaders();
-            if (isset($hs['Authorization']) && strpos($hs['Authorization'], 'oauth_signature') !== false) {
+            if (isset($hs['Authorization']) && false !== strpos($hs['Authorization'], 'oauth_signature')) {
                 $signed = true;
             } else {
                 $signed = false;
@@ -97,13 +124,14 @@ class OAuthRequestVerifier extends OAuthRequest
         return $signed;
     }
 
-
     /**
      * Verify the request if it seemed to be signed.
      *
      * @param string token_type the kind of token needed, defaults to 'access'
+     *
      * @exception OAuthException2 thrown when the request did not verify
-     * @return boolean    true when signed, false when not signed
+     *
+     * @return bool true when signed, false when not signed
      */
     public function verifyIfSigned($token_type = 'access')
     {
@@ -119,12 +147,13 @@ class OAuthRequestVerifier extends OAuthRequest
         return $signed;
     }
 
-
     /**
      * Verify the request
      *
      * @param string token_type the kind of token needed, defaults to 'access' (false, 'access', 'request')
+     *
      * @exception OAuthException2 thrown when the request did not verify
+     *
      * @return int user_id associated with token (false when no user associated)
      */
     public function verify($token_type = 'access')
@@ -134,24 +163,24 @@ class OAuthRequestVerifier extends OAuthRequest
         return $retval['user_id'];
     }
 
-
     /**
      * Verify the request
      *
      * @param string token_type the kind of token needed, defaults to 'access' (false, 'access', 'request')
-     * @exception OAuthException2 thrown when the request did not verify
-     * @return array ('user_id' => associated with token (false when no user associated),
-     *  'consumer_key' => the associated consumer_key)
      *
+     * @exception OAuthException2 thrown when the request did not verify
+     *
+     * @return array ('user_id' => associated with token (false when no user associated),
+     *               'consumer_key' => the associated consumer_key)
      */
     public function verifyExtended($token_type = 'access')
     {
         $consumer_key = $this->getParam('oauth_consumer_key');
         $token = $this->getParam('oauth_token');
         $user_id = false;
-        $secrets = array();
+        $secrets = [];
 
-        if ($consumer_key && ($token_type === false || $token)) {
+        if ($consumer_key && (false === $token_type || $token)) {
             $secrets = $this->store->getSecretsForVerify(
                 $this->urldecode($consumer_key),
                 $this->urldecode($token),
@@ -173,8 +202,8 @@ class OAuthRequestVerifier extends OAuthRequest
             try {
                 $this->verifySignature($secrets['consumer_secret'], $secrets['token_secret'], $token_type);
             } catch (OAuthException2 $e) {
-                throw new OAuthException2('Verification of signature failed (signature base string was "'.$this->signatureBaseString().'").'
-                    ." with  ".print_r(array($secrets['consumer_secret'], $secrets['token_secret'], $token_type), true));
+                throw new OAuthException2('Verification of signature failed (signature base string was "' . $this->signatureBaseString() . '").'
+                    . ' with  ' . print_r([$secrets['consumer_secret'], $secrets['token_secret'], $token_type], true));
             }
 
             // Check the optional body signature
@@ -205,9 +234,8 @@ class OAuthRequestVerifier extends OAuthRequest
             throw new OAuthException2('Can\'t verify request, missing oauth_consumer_key or oauth_token');
         }
 
-        return array('user_id' => $user_id, 'consumer_key' => $consumer_key, 'osr_id' => $secrets['osr_id']);
+        return ['user_id' => $user_id, 'consumer_key' => $consumer_key, 'osr_id' => $secrets['osr_id']];
     }
-
 
     /**
      * Verify the signature of the request, using the method in oauth_signature_method.
@@ -216,27 +244,28 @@ class OAuthRequestVerifier extends OAuthRequest
      *
      * @param string consumer_secret
      * @param string token_secret
+     *
      * @exception OAuthException2 thrown when the signature method is unknown
      * @exception OAuthException2 when not all parts available
      * @exception OAuthException2 when signature does not match
      */
     public function verifySignature($consumer_secret, $token_secret, $token_type = 'access')
     {
-        $required = array(
+        $required = [
             'oauth_consumer_key',
             'oauth_signature_method',
             'oauth_timestamp',
             'oauth_nonce',
-            'oauth_signature'
-        );
+            'oauth_signature',
+        ];
 
-        if ($token_type !== false) {
+        if (false !== $token_type) {
             $required[] = 'oauth_token';
         }
 
         foreach ($required as $req) {
-            if (! isset($this->param[$req])) {
-                throw new OAuthException2('Can\'t verify request signature, missing parameter "'.$req.'"');
+            if (!isset($this->param[$req])) {
+                throw new OAuthException2('Can\'t verify request signature, missing parameter "' . $req . '"');
             }
         }
 
@@ -246,7 +275,6 @@ class OAuthRequestVerifier extends OAuthRequest
         $this->verifyDataSignature($base, $consumer_secret, $token_secret, $this->param['oauth_signature_method'], $this->param['oauth_signature']);
     }
 
-
     /**
      * Verify the signature of a string.
      *
@@ -255,36 +283,34 @@ class OAuthRequestVerifier extends OAuthRequest
      * @param string    token_secret
      * @param string    signature_method
      * @param string    signature
+     *
      * @exception OAuthException2 thrown when the signature method is unknown
      * @exception OAuthException2 when signature does not match
      */
     public function verifyDataSignature($data, $consumer_secret, $token_secret, $signature_method, $signature)
     {
-        if (is_null($data)) {
+        if (null === $data) {
             $data = '';
         }
 
         $sig = $this->getSignatureMethod($signature_method);
-        if (! $sig->verify($this, $data, $consumer_secret, $token_secret, $signature)) {
-            throw new OAuthException2('Signature verification failed ('.$signature_method.')');
+        if (!$sig->verify($this, $data, $consumer_secret, $token_secret, $signature)) {
+            throw new OAuthException2('Signature verification failed (' . $signature_method . ')');
         }
     }
 
     /**
-     *
      * @param array $accepted The array of accepted signature methods, or if null is passed
-     * all supported methods are accepted and there is no filtering.
-     *
+     *                        all supported methods are accepted and there is no filtering.
      */
     public function setAcceptedSignatureMethods($accepted = null)
     {
         if (is_array($accepted)) {
             $this->accepted_signatures = $accepted;
-        } elseif ($accepted == null) {
+        } elseif (null == $accepted) {
             $this->accepted_signatures = null;
         }
     }
 }
-
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */

@@ -1,17 +1,48 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * OAuth signature implementation using HMAC-SHA1
  *
  * @version $Id$
+ *
  * @author Marc Worrell <marcw@pobox.com>
+ *
  * @date  Sep 8, 2008 12:21:19 PM
  *
  * The MIT License
@@ -36,10 +67,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-
-require_once dirname(__FILE__).'/OAuthSignatureMethod.class.php';
-
+require_once dirname(__FILE__) . '/OAuthSignatureMethod.class.php';
 
 class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
 {
@@ -47,7 +75,6 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
     {
         return 'HMAC-SHA1';
     }
-
 
     /**
      * Calculate the signature using HMAC-SHA1
@@ -57,13 +84,14 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
      * @param string base_string
      * @param string consumer_secret
      * @param string token_secret
+     *
      * @return string
      */
     public function signature($request, $base_string, $consumer_secret, $token_secret)
     {
-        $key = $request->urlencode($consumer_secret).'&'.$request->urlencode($token_secret);
+        $key = $request->urlencode($consumer_secret) . '&' . $request->urlencode($token_secret);
         if (function_exists('hash_hmac')) {
-            $signature = base64_encode(hash_hmac("sha1", $base_string, $key, true));
+            $signature = base64_encode(hash_hmac('sha1', $base_string, $key, true));
         } else {
             $blocksize = 64;
             $hashfunc = 'sha1';
@@ -72,14 +100,14 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
             }
             $key = str_pad($key, $blocksize, chr(0x00));
             $ipad = str_repeat(chr(0x36), $blocksize);
-            $opad = str_repeat(chr(0x5c), $blocksize);
+            $opad = str_repeat(chr(0x5C), $blocksize);
             $hmac = pack(
                 'H*',
                 $hashfunc(
-                    ($key ^ $opad).pack(
+                    ($key ^ $opad) . pack(
                         'H*',
                         $hashfunc(
-                            ($key ^ $ipad).$base_string
+                            ($key ^ $ipad) . $base_string
                         )
                     )
                 )
@@ -90,7 +118,6 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
         return $request->urlencode($signature);
     }
 
-
     /**
      * Check if the request signature corresponds to the one calculated for the request.
      *
@@ -99,6 +126,7 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
      * @param string consumer_secret
      * @param string token_secret
      * @param string signature        from the request, still urlencoded
+     *
      * @return string
      */
     public function verify($request, $base_string, $consumer_secret, $token_secret, $signature)
@@ -114,6 +142,5 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
         return rawurlencode($valA) == rawurlencode($valB);
     }
 }
-
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */

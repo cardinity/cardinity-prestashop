@@ -1,12 +1,41 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Parse a XRDS discovery description to a simple array format.
  *
@@ -14,8 +43,8 @@
  * in a later version.
  *
  * @version $Id$
- * @author Marc Worrell <marcw@pobox.com>
  *
+ * @author Marc Worrell <marcw@pobox.com>
  *
  * The MIT License
  *
@@ -57,14 +86,16 @@ print_r($xrds);
  * TODO: support for URIs to definition instead of local xml:id
  *
  * @param string data contents of xrds file
+ *
  * @exception Exception when the file is in an unknown format
+ *
  * @return array
  */
 function xrds_parse($data)
 {
-    $oauth = array();
+    $oauth = [];
     $doc = @DOMDocument::loadXML($data);
-    if ($doc === false) {
+    if (false === $doc) {
         throw new Exception('Error in XML, can\'t load XRDS document');
     }
 
@@ -80,10 +111,10 @@ function xrds_parse($data)
 
     foreach ($uris as $uri) {
         // TODO: support uris referring to service documents outside this one
-        if ($uri{0} == '#') {
+        if ('#' == $uri[0]) {
             $id = substr($uri, 1);
             $oauth = xrds_xrd_oauth($xpath, $id);
-            if (is_array($oauth) && ! empty($oauth)) {
+            if (is_array($oauth) && !empty($oauth)) {
                 return $oauth;
             }
         }
@@ -92,30 +123,30 @@ function xrds_parse($data)
     return false;
 }
 
-
 /**
  * Parse a XRD definition for OAuth and return the uris etc.
  *
  * @param XPath xpath
  * @param string id
+ *
  * @return array
  */
 function xrds_xrd_oauth($xpath, $id)
 {
-    $oauth = array();
-    $xrd = $xpath->query('//xrds:XRDS/xrd:XRD[@xml:id="'.$id.'"]');
-    if ($xrd->length == 0) {
+    $oauth = [];
+    $xrd = $xpath->query('//xrds:XRDS/xrd:XRD[@xml:id="' . $id . '"]');
+    if (0 == $xrd->length) {
         // Yahoo! uses another namespace
-        $xrd = $xpath->query('//xrds:XRDS/xrd2:XRD[@xml:id="'.$id.'"]');
+        $xrd = $xpath->query('//xrds:XRDS/xrd2:XRD[@xml:id="' . $id . '"]');
     }
 
-    if ($xrd->length >= 1) {
+    if (1 <= $xrd->length) {
         $x = $xrd->item(0);
-        $services = array();
+        $services = [];
         foreach ($x->childNodes as $n) {
             switch ($n->nodeName) {
                 case 'Type':
-                    if ($n->nodeValue != 'xri://$xrds*simple') {
+                    if ('xri://$xrds*simple' != $n->nodeValue) {
                         // Not a simple XRDS document
                         return false;
                     }
@@ -143,36 +174,36 @@ function xrds_xrd_oauth($xpath, $id)
     return $oauth;
 }
 
-
 /**
  * Parse a service definition for OAuth in a simple xrd element
  *
  * @param DOMElement n
+ *
  * @return array (type, service desc)
  */
 function xrds_xrd_oauth_service($n)
 {
-    $service = array(
-        'uri'              => '',
-        'signature_method' => array(),
-        'parameters'       => array()
-    );
+    $service = [
+        'uri' => '',
+        'signature_method' => [],
+        'parameters' => [],
+    ];
 
     $type = false;
     foreach ($n->childNodes as $c) {
         $name = $c->nodeName;
         $value = $c->nodeValue;
 
-        if ($name == 'URI') {
+        if ('URI' == $name) {
             $service['uri'] = $value;
-        } elseif ($name == 'Type') {
-            if (strncmp($value, 'http://oauth.net/core/1.0/endpoint/', 35) == 0) {
+        } elseif ('Type' == $name) {
+            if (0 == strncmp($value, 'http://oauth.net/core/1.0/endpoint/', 35)) {
                 $type = basename($value);
-            } elseif (strncmp($value, 'http://oauth.net/core/1.0/signature/', 36) == 0) {
+            } elseif (0 == strncmp($value, 'http://oauth.net/core/1.0/signature/', 36)) {
                 $service['signature_method'][] = basename($value);
-            } elseif (strncmp($value, 'http://oauth.net/core/1.0/parameters/', 37) == 0) {
+            } elseif (0 == strncmp($value, 'http://oauth.net/core/1.0/parameters/', 37)) {
                 $service['parameters'][] = basename($value);
-            } elseif (strncmp($value, 'http://oauth.net/discovery/1.0/consumer-identity/', 49) == 0) {
+            } elseif (0 == strncmp($value, 'http://oauth.net/discovery/1.0/consumer-identity/', 49)) {
                 $type = 'consumer_identity';
                 $service['method'] = basename($value);
                 unset($service['signature_method']);
@@ -180,34 +211,34 @@ function xrds_xrd_oauth_service($n)
             } else {
                 $service['unknown'][] = $value;
             }
-        } elseif ($name == 'LocalID') {
+        } elseif ('LocalID' == $name) {
             $service['consumer_key'] = $value;
-        } elseif ($name{0} != '#') {
+        } elseif ('#' != $name[0]) {
             $service[strtolower($name)] = $value;
         }
     }
 
-    return array($type, $service);
+    return [$type, $service];
 }
-
 
 /**
  * Return the OAuth service uris in order of the priority.
  *
  * @param XPath xpath
+ *
  * @return array
  */
 function xrds_oauth_service_uris($xpath)
 {
-    $uris = array();
+    $uris = [];
     $xrd_oauth = $xpath->query('//xrds:XRDS/xrd:XRD/xrd:Service/xrd:Type[.=\'http://oauth.net/discovery/1.0\']');
-    if ($xrd_oauth->length > 0) {
-        $service = array();
+    if (0 < $xrd_oauth->length) {
+        $service = [];
         foreach ($xrd_oauth as $xo) {
             // Find the URI of the service definition
             $cs = $xo->parentNode->childNodes;
             foreach ($cs as $c) {
-                if ($c->nodeName == 'URI') {
+                if ('URI' == $c->nodeName) {
                     $prio = xrds_priority($xo);
                     $service[$prio][] = $c->nodeValue;
                 }
@@ -219,21 +250,21 @@ function xrds_oauth_service_uris($xpath)
     return $uris;
 }
 
-
 /**
  * Flatten an array according to the priority
  *
  * @param array  ps buckets per prio
+ *
  * @return array one dimensional array
  */
 function xrds_priority_flatten($ps)
 {
-    $prio = array();
-    $null = array();
+    $prio = [];
+    $null = [];
     ksort($ps);
     foreach ($ps as $idx => $bucket) {
-        if (! empty($bucket)) {
-            if ($idx == 'null') {
+        if (!empty($bucket)) {
+            if ('null' == $idx) {
                 $null = $bucket;
             } else {
                 $prio = array_merge($prio, $bucket);
@@ -245,19 +276,19 @@ function xrds_priority_flatten($ps)
     return $prio;
 }
 
-
 /**
  * Fetch the priority of a element
  *
  * @param DOMElement elt
- * @return mixed        'null' or int
+ *
+ * @return mixed 'null' or int
  */
 function xrds_priority($elt)
 {
     if ($elt->hasAttribute('priority')) {
         $prio = $elt->getAttribute('priority');
         if (is_numeric($prio)) {
-            $prio = intval($prio);
+            $prio = (int) $prio;
         }
     } else {
         $prio = 'null';
@@ -265,6 +296,5 @@ function xrds_priority($elt)
 
     return $prio;
 }
-
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */

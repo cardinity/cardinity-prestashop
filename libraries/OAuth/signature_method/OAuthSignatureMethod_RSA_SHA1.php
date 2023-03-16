@@ -1,17 +1,48 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * OAuth signature implementation using PLAINTEXT
  *
  * @version $Id$
+ *
  * @author Marc Worrell <marcw@pobox.com>
+ *
  * @date  Sep 8, 2008 12:00:14 PM
  *
  * The MIT License
@@ -36,9 +67,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-
-require_once dirname(__FILE__).'/OAuthSignatureMethod.class.php';
+require_once dirname(__FILE__) . '/OAuthSignatureMethod.class.php';
 
 class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
 {
@@ -47,11 +76,11 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
         return 'RSA-SHA1';
     }
 
-
     /**
      * Fetch the public CERT key for the signature
      *
      * @param OAuthRequest request
+     *
      * @return string public key
      */
     protected function fetch_public_cert($request)
@@ -62,14 +91,14 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
         // (3) some sort of specific discovery code based on request
         //
         // either way should return a string representation of the certificate
-        throw OAuthException2("OAuthSignatureMethod_RSA_SHA1::fetch_public_cert not implemented");
+        throw OAuthException2('OAuthSignatureMethod_RSA_SHA1::fetch_public_cert not implemented');
     }
-
 
     /**
      * Fetch the private CERT key for the signature
      *
      * @param OAuthRequest request
+     *
      * @return string private key
      */
     protected function fetch_private_cert($request)
@@ -78,9 +107,8 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
         // (1) do a lookup in a table of trusted certs keyed off of consumer
         //
         // either way should return a string representation of the certificate
-        throw OAuthException2("OAuthSignatureMethod_RSA_SHA1::fetch_private_cert not implemented");
+        throw OAuthException2('OAuthSignatureMethod_RSA_SHA1::fetch_private_cert not implemented');
     }
-
 
     /**
      * Calculate the signature using RSA-SHA1
@@ -90,6 +118,7 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
      * @param string base_string
      * @param string consumer_secret
      * @param string token_secret
+     *
      * @return string
      */
     public function signature($request, $base_string, $consumer_secret, $token_secret)
@@ -110,7 +139,6 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
         return $request->urlencode(base64_encode($sig));
     }
 
-
     /**
      * Check if the request signature is the same as the one calculated for the request.
      *
@@ -119,6 +147,7 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
      * @param string consumer_secret
      * @param string token_secret
      * @param string signature
+     *
      * @return string
      */
     public function verify($request, $base_string, $consumer_secret, $token_secret, $signature)
@@ -137,7 +166,7 @@ class OAuthSignatureMethod_RSA_SHA1 extends OAuthSignatureMethod
         // Release the key resource
         openssl_free_key($publickeyid);
 
-        return $ok == 1;
+        return 1 == $ok;
     }
 }
 

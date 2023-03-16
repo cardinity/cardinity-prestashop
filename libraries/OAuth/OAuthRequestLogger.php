@@ -1,19 +1,49 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    DIGITAL RETAIL TECHNOLOGIES SL <mail@simlachat.com>
+ *  @copyright 2021 DIGITAL RETAIL TECHNOLOGIES SL
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
+
 /**
  * Log OAuth requests
  *
  * @version $Id: OAuthRequestLogger.php 98 2010-03-08 12:48:59Z brunobg@corollarium.com $
- * @author Marc Worrell <marcw@pobox.com>
- * @date  Dec 7, 2007 12:22:43 PM
  *
+ * @author Marc Worrell <marcw@pobox.com>
+ *
+ * @date  Dec 7, 2007 12:22:43 PM
  *
  * The MIT License
  *
@@ -39,15 +69,15 @@
  */
 class OAuthRequestLogger
 {
-    private static $logging        = 0;
+    private static $logging = 0;
     private static $enable_logging = null;
-    private static $store_log      = null;
-    private static $note           = '';
-    private static $user_id        = null;
+    private static $store_log = null;
+    private static $note = '';
+    private static $user_id = null;
     private static $request_object = null;
-    private static $sent           = null;
-    private static $received       = null;
-    private static $log            = array();
+    private static $sent = null;
+    private static $received = null;
+    private static $log = [];
 
     /**
      * Start any logging, checks the system configuration if logging is needed.
@@ -57,38 +87,36 @@ class OAuthRequestLogger
     public static function start($request_object = null)
     {
         if (defined('OAUTH_LOG_REQUEST')) {
-            if (is_null(OAuthRequestLogger::$enable_logging)) {
+            if (null === OAuthRequestLogger::$enable_logging) {
                 OAuthRequestLogger::$enable_logging = true;
             }
-            if (is_null(OAuthRequestLogger::$store_log)) {
+            if (null === OAuthRequestLogger::$store_log) {
                 OAuthRequestLogger::$store_log = true;
             }
         }
 
-        if (OAuthRequestLogger::$enable_logging && ! OAuthRequestLogger::$logging) {
+        if (OAuthRequestLogger::$enable_logging && !OAuthRequestLogger::$logging) {
             OAuthRequestLogger::$logging = true;
             OAuthRequestLogger::$request_object = $request_object;
             ob_start();
 
             // Make sure we flush our log entry when we stop the request (eg on an exception)
-            register_shutdown_function(array('OAuthRequestLogger', 'flush'));
+            register_shutdown_function(['OAuthRequestLogger', 'flush']);
         }
     }
-
 
     /**
      * Force logging, needed for performing test connects independent from the debugging setting.
      *
-     * @param boolean  store_log        (optional) true to store the log in the db
+     * @param bool  store_log        (optional) true to store the log in the db
      */
     public static function enableLogging($store_log = null)
     {
         OAuthRequestLogger::$enable_logging = true;
-        if (! is_null($store_log)) {
+        if (null !== $store_log) {
             OAuthRequestLogger::$store_log = $store_log;
         }
     }
-
 
     /**
      * Logs the request to the database, sends any cached output.
@@ -99,25 +127,25 @@ class OAuthRequestLogger
         if (OAuthRequestLogger::$logging) {
             OAuthRequestLogger::$logging = false;
 
-            if (is_null(OAuthRequestLogger::$sent)) {
+            if (null === OAuthRequestLogger::$sent) {
                 // What has been sent to the user-agent?
                 $data = ob_get_contents();
-                if (strlen($data) > 0) {
+                if ('' !== $data) {
                     ob_end_flush();
                 } elseif (ob_get_level()) {
                     ob_end_clean();
                 }
                 $hs = headers_list();
-                $sent = implode("\n", $hs)."\n\n".$data;
+                $sent = implode("\n", $hs) . "\n\n" . $data;
             } else {
                 // The request we sent
                 $sent = OAuthRequestLogger::$sent;
             }
 
-            if (is_null(OAuthRequestLogger::$received)) {
+            if (null === OAuthRequestLogger::$received) {
                 // Build the request we received
                 $hs0 = self::getAllHeaders();
-                $hs = array();
+                $hs = [];
                 foreach ($hs0 as $h => $v) {
                     $hs[] = "$h: $v";
                 }
@@ -125,7 +153,7 @@ class OAuthRequestLogger
                 $data = '';
                 $fh = @fopen('php://input', 'r');
                 if ($fh) {
-                    while (! feof($fh)) {
+                    while (!feof($fh)) {
                         $s = fread($fh, 1024);
                         if (is_string($s)) {
                             $data .= $s;
@@ -133,7 +161,7 @@ class OAuthRequestLogger
                     }
                     fclose($fh);
                 }
-                $received = implode("\n", $hs)."\n\n".$data;
+                $received = implode("\n", $hs) . "\n\n" . $data;
             } else {
                 // The answer we received
                 $received = OAuthRequestLogger::$received;
@@ -147,7 +175,7 @@ class OAuthRequestLogger
             }
 
             // Figure out to what keys we want to log this request
-            $keys = array();
+            $keys = [];
             if (OAuthRequestLogger::$request_object) {
                 $consumer_key = OAuthRequestLogger::$request_object->getParam('oauth_consumer_key', true);
                 $token = OAuthRequestLogger::$request_object->getParam('oauth_token', true);
@@ -175,16 +203,15 @@ class OAuthRequestLogger
                 $store->addLog($keys, $received, $sent, $base_string, OAuthRequestLogger::$note, OAuthRequestLogger::$user_id);
             }
 
-            OAuthRequestLogger::$log[] = array(
-                'keys'        => $keys,
-                'received'    => $received,
-                'sent'        => $sent,
+            OAuthRequestLogger::$log[] = [
+                'keys' => $keys,
+                'received' => $received,
+                'sent' => $sent,
                 'base_string' => $base_string,
-                'note'        => OAuthRequestLogger::$note
-            );
+                'note' => OAuthRequestLogger::$note,
+            ];
         }
     }
-
 
     /**
      * Add a note, used by the OAuthException2 to log all exceptions.
@@ -193,7 +220,7 @@ class OAuthRequestLogger
      */
     public static function addNote($note)
     {
-        OAuthRequestLogger::$note .= $note."\n\n";
+        OAuthRequestLogger::$note .= $note . "\n\n";
     }
 
     /**
@@ -206,7 +233,6 @@ class OAuthRequestLogger
         OAuthRequestLogger::$request_object = $request_object;
     }
 
-
     /**
      * Set the relevant user (defaults to the current user)
      *
@@ -216,7 +242,6 @@ class OAuthRequestLogger
     {
         OAuthRequestLogger::$user_id = $user_id;
     }
-
 
     /**
      * Set the request we sent
@@ -238,7 +263,6 @@ class OAuthRequestLogger
         OAuthRequestLogger::$received = $reply;
     }
 
-
     /**
      * Get the the log till now
      *
@@ -249,7 +273,6 @@ class OAuthRequestLogger
         return OAuthRequestLogger::$log;
     }
 
-
     /**
      * helper to try to sort out headers for people who aren't running apache,
      * or people who are running PHP as FastCGI.
@@ -258,8 +281,8 @@ class OAuthRequestLogger
      */
     public static function getAllHeaders()
     {
-        $retarr = array();
-        $headers = array();
+        $retarr = [];
+        $headers = [];
 
         if (function_exists('apache_request_headers')) {
             $headers = apache_request_headers();
@@ -270,23 +293,23 @@ class OAuthRequestLogger
             $headers = array_merge($_ENV, $_SERVER);
 
             foreach ($headers as $key => $val) {
-                //we need this header
-                if (strpos(strtolower($key), 'content-type') !== false) {
+                // we need this header
+                if (false !== strpos(strtolower($key), 'content-type')) {
                     continue;
                 }
-                if (strtoupper(substr($key, 0, 5)) != "HTTP_") {
+                if ('HTTP_' != strtoupper(substr($key, 0, 5))) {
                     unset($headers[$key]);
                 }
             }
         }
 
-        //Normalize this array to Cased-Like-This structure.
+        // Normalize this array to Cased-Like-This structure.
         foreach ($headers as $key => $value) {
             $key = preg_replace('/^HTTP_/i', '', $key);
             $key = str_replace(
-                " ",
-                "-",
-                ucwords(strtolower(str_replace(array("-", "_"), " ", $key)))
+                ' ',
+                '-',
+                ucwords(strtolower(str_replace(['-', '_'], ' ', $key)))
             );
             $retarr[$key] = $value;
         }
