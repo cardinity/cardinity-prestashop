@@ -14,13 +14,13 @@
                         <td style="width: 80px; text-align: center;">Year</td>
                         <td style="width: 150px">
                             <select name='year'>
-                               {$allYearOptions nofilter}
+                               {$allYearOptions|escape:'htmlall':'UTF-8'}
                             </select>
                         </td>
                         <td style="width: 80px; text-align: center;">Month</td>
                         <td style="width: 150px">
                             <select name='month'>
-                               {$allMonthOptions nofilter}
+                               {$allMonthOptions|escape:'htmlall':'UTF-8'}
                             </select>
                         </td>
                         <td class="actions" style="padding-left: 20px">
