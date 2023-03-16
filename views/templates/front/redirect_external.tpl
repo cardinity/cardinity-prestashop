@@ -21,14 +21,14 @@
 
         <form name="checkout" method="POST" action="https://checkout.cardinity.com" id="redirectForm">
             <button class="btn btn-primary" type=submit>Click Here</button>
-			<input type="hidden" name="amount" value="{$attributes['amount']}" />
-			<input type="hidden" name="country" value="{$attributes['country']}" />
-			<input type="hidden" name="currency" value="{$attributes['currency']}" />
-			<input type="hidden" name="description" value="{$attributes['description']}" />
-			<input type="hidden" name="order_id" value="{$attributes['order_id']}" />
-			<input type="hidden" name="project_id" value="{$attributes['project_id']}" />
-			<input type="hidden" name="return_url" value="{$attributes['return_url']}" />
-			<input type="hidden" name="signature" value="{$attributes['signature']}" />
+			<input type="hidden" name="amount" value="{$attributes['amount']|escape:'htmlall':'UTF-8'}" />
+			<input type="hidden" name="country" value="{$attributes['country']|escape:'htmlall':'UTF-8'}" />
+			<input type="hidden" name="currency" value="{$attributes['currency']|escape:'htmlall':'UTF-8'}" />
+			<input type="hidden" name="description" value="{$attributes['description']|escape:'htmlall':'UTF-8'}" />
+			<input type="hidden" name="order_id" value="{$attributes['order_id']|escape:'htmlall':'UTF-8'}" />
+			<input type="hidden" name="project_id" value="{$attributes['project_id']|escape:'htmlall':'UTF-8'}" />
+			<input type="hidden" name="return_url" value="{$attributes['return_url']|escape:'htmlall':'UTF-8'}" />
+			<input type="hidden" name="signature" value="{$attributes['signature']|escape:'htmlall':'UTF-8'}" />
       </form>
 
     </section>
