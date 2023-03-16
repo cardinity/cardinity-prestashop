@@ -277,7 +277,7 @@ class OAuthRequestLogger
      * helper to try to sort out headers for people who aren't running apache,
      * or people who are running PHP as FastCGI.
      *
-     * @return array of request headers as associative array.
+     * @return array of request headers as associative array
      */
     public static function getAllHeaders()
     {

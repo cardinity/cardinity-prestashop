@@ -78,7 +78,7 @@ class OAuthSessionSESSION extends OAuthSessionAbstract
      *
      * @param string $key
      *
-     * @return The value or null if not set.
+     * @return The value or null if not set
      */
     public function get($key)
     {

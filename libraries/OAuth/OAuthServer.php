@@ -91,8 +91,8 @@ class OAuthServer extends OAuthRequestVerifier
      * @param string request
      * @param string method
      * @param array params The request parameters
-     * @param string store The session storage class.
-     * @param array store_options The session storage class parameters.
+     * @param string store The session storage class
+     * @param array store_options The session storage class parameters
      * @param array options Extra options:
      *   - allowed_uri_schemes: list of allowed uri schemes.
      *   - disallowed_uri_schemes: list of unallowed uri schemes.

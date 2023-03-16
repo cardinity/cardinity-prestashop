@@ -59,6 +59,6 @@ foreach ($ps as $p) {
 
     mysql_query($p);
     if (mysql_errno()) {
-        die(' Error ' . mysql_errno() . ': ' . mysql_error());
+        exit(' Error ' . mysql_errno() . ': ' . mysql_error());
     }
 }

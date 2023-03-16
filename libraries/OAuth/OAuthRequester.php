@@ -299,7 +299,7 @@ class OAuthRequester extends OAuthRequestSigner
     /**
      * Open and close a curl session passing all the options to the curl libs
      *
-     * @param array opts the curl options.
+     * @param array opts the curl options
      *
      * @exception OAuthException2 when temporary file for PUT operation could not be created
      *

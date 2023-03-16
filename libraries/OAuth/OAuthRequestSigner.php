@@ -83,7 +83,7 @@ class OAuthRequestSigner extends OAuthRequest
      * When you supply a string, then it is assumed it is of the type application/x-www-form-urlencoded
      *
      * @param string request    url
-     * @param string method        PUT, GET, POST etc.
+     * @param string method        PUT, GET, POST etc
      * @param mixed params        string (for urlencoded data, or array with name/value pairs)
      * @param string body        optional body for PUT and/or POST requests
      */

@@ -202,8 +202,12 @@ class OAuthRequestVerifier extends OAuthRequest
             try {
                 $this->verifySignature($secrets['consumer_secret'], $secrets['token_secret'], $token_type);
             } catch (OAuthException2 $e) {
-                throw new OAuthException2('Verification of signature failed (signature base string was "' . $this->signatureBaseString() . '").'
-                    . ' with  ' . print_r([$secrets['consumer_secret'], $secrets['token_secret'], $token_type], true));
+                $message = 'Verification of signature failed (signature base string was "'
+                    . $this->signatureBaseString()
+                    . '") with  '
+                    . print_r([$secrets['consumer_secret'], $secrets['token_secret'], $token_type], true);
+
+                throw new OAuthException2($message);
             }
 
             // Check the optional body signature
@@ -301,7 +305,7 @@ class OAuthRequestVerifier extends OAuthRequest
 
     /**
      * @param array $accepted The array of accepted signature methods, or if null is passed
-     *                        all supported methods are accepted and there is no filtering.
+     *                        all supported methods are accepted and there is no filtering
      */
     public function setAcceptedSignatureMethods($accepted = null)
     {

@@ -100,7 +100,7 @@ class OAuthRequest
      * When not supplied with any parameters this will use the current request.
      *
      * @param string    uri                might include parameters
-     * @param string    method            GET, PUT, POST etc.
+     * @param string    method            GET, PUT, POST etc
      * @param string    parameters        additional post parameters, urlencoded (RFC1738)
      * @param array        headers            headers for request
      * @param string    body            optional body of the OAuth request (POST or PUT)

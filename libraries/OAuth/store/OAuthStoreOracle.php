@@ -124,7 +124,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_SECRETS_FOR_VERIFY(:P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_TYPE, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -189,7 +189,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_SECRETS_FOR_SIGNATURE(:P_HOST, :P_PATH, :P_USER_ID, :P_NAME, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_HOST', $host, 255);
@@ -261,7 +261,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_SERVER_TOKEN_SECRETS(:P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_TYPE, :P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -358,7 +358,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_ADD_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID, :P_NAME, :P_TOKEN_TYPE, :P_TOKEN, :P_TOKEN_SECRET, :P_TOKEN_INTERVAL_IN_SEC, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -390,7 +390,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_DELETE_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -418,7 +418,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_SERVER(:P_CONSUMER_KEY, :P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -476,7 +476,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_SERVER_FOR_URI(:P_HOST, :P_PATH,:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_HOST', $host, 255);
@@ -516,7 +516,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_LIST_SERVER_TOKENS(:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 40);
@@ -550,7 +550,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_COUNT_SERVICE_TOKENS(:P_CONSUMER_KEY, :P_COUNT, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -579,7 +579,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID,:P_TOKEN, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -619,7 +619,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_DELETE_SERVER_TOKEN(:P_CONSUMER_KEY, :P_USER_ID,:P_TOKEN, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -651,7 +651,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
             $sql = 'BEGIN SP_SET_SERVER_TOKEN_TTL(:P_TOKEN_TTL, :P_CONSUMER_KEY, :P_TOKEN, :P_RESULT); END;';
 
             // parse sql
-            $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+            $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
             // Bind In and Out Variables
             oci_bind_by_name($stmt, ':P_TOKEN_TTL', $token_ttl, 40);
@@ -681,7 +681,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_LIST_SERVERS(:P_Q, :P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_Q', $q, 255);
@@ -755,7 +755,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
                  :P_OCR_USA_ID_REF, :P_UPDATE_P_OCR_USA_ID_REF_FLAG, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
         $server['request_token_uri'] = isset($server['request_token_uri']) ? $server['request_token_uri'] : '';
         $server['authorize_uri'] = isset($server['authorize_uri']) ? $server['authorize_uri'] : '';
         $server['access_token_uri'] = isset($server['access_token_uri']) ? $server['access_token_uri'] : '';
@@ -814,7 +814,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_UPDATE_CONSUMER(:P_OSR_USA_ID_REF, :P_OSR_CONSUMER_KEY, :P_OSR_CONSUMER_SECRET, :P_OSR_REQUESTER_NAME, :P_OSR_REQUESTER_EMAIL, :P_OSR_CALLBACK_URI, :P_OSR_APPLICATION_URI, :P_OSR_APPLICATION_TITLE  , :P_OSR_APPLICATION_DESCR, :P_OSR_APPLICATION_NOTES, :P_OSR_APPLICATION_TYPE, :P_OSR_APPLICATION_COMMERCIAL, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_OSR_USA_ID_REF', $user_id, 40);
@@ -850,7 +850,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_DELETE_CONSUMER(:P_CONSUMER_KEY, :P_USER_ID, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -878,7 +878,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_CONSUMER(:P_CONSUMER_KEY, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -925,7 +925,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_CONSUMER_STATIC_SELECT(:P_OSR_CONSUMER_KEY, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_OSR_CONSUMER_KEY', $consumer, 255);
@@ -940,7 +940,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
             $sql = 'BEGIN SP_CONSUMER_STATIC_SAVE(:P_OSR_CONSUMER_KEY, :P_RESULT); END;';
 
             // parse sql
-            $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+            $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
             // Bind In and Out Variables
             oci_bind_by_name($stmt, ':P_OSR_CONSUMER_KEY', $consumer_key, 255);
@@ -983,7 +983,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_ADD_CONSUMER_REQUEST_TOKEN(:P_TOKEN_TTL, :P_CONSUMER_KEY, :P_TOKEN, :P_TOKEN_SECRET, :P_CALLBACK_URL, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN_TTL', $ttl, 20);
@@ -1013,7 +1013,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_CONSUMER_REQUEST_TOKEN(:P_TOKEN, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
@@ -1044,7 +1044,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_DEL_CONSUMER_REQUEST_TOKEN(:P_TOKEN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
@@ -1069,7 +1069,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_AUTH_CONSUMER_REQ_TOKEN(:P_USER_ID, :P_REFERRER_HOST, :P_VERIFIER, :P_TOKEN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
@@ -1106,7 +1106,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_COUNT_CONSUMER_ACCESS_TOKEN(:P_CONSUMER_KEY, :P_COUNT, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -1137,7 +1137,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_EXCH_CONS_REQ_FOR_ACC_TOKEN(:P_TOKEN_TTL, :P_NEW_TOKEN, :P_TOKEN, :P_TOKEN_SECRET, :P_VERIFIER, :P_OUT_TOKEN_TTL, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_TOKEN_TTL', $options['token_ttl'], 255);
@@ -1174,7 +1174,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_GET_CONSUMER_ACCESS_TOKEN(:P_USER_ID, :P_TOKEN, :P_ROWS :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
@@ -1227,7 +1227,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_DEL_CONSUMER_ACCESS_TOKEN(:P_USER_ID, :P_TOKEN, :P_USER_IS_ADMIN, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
@@ -1257,7 +1257,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
             $sql = 'BEGIN SP_SET_CONSUMER_ACC_TOKEN_TTL(:P_TOKEN, :P_TOKEN_TTL, :P_RESULT); END;';
 
             // parse sql
-            $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+            $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
             // Bind In and Out Variables
             oci_bind_by_name($stmt, ':P_TOKEN', $token, 255);
@@ -1282,7 +1282,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_LIST_CONSUMERS(:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
@@ -1329,7 +1329,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_LIST_CONSUMER_TOKENS(:P_USER_ID, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_USER_ID', $user_id, 255);
@@ -1365,7 +1365,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_CHECK_SERVER_NONCE(:P_CONSUMER_KEY, :P_TOKEN, :P_TIMESTAMP, :P_MAX_TIMESTAMP_SKEW, :P_NONCE, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_CONSUMER_KEY', $consumer_key, 255);
@@ -1417,7 +1417,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_ADD_LOG(:P_RECEIVED, :P_SENT, :P_BASE_STRING, :P_NOTES, :P_USA_ID_REF, :P_REMOTE_IP, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_RECEIVED', $olg_received, 255);
@@ -1452,7 +1452,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         $sql = 'BEGIN SP_LIST_LOG(:P_OPTION_FLAG, :P_USA_ID, :P_OSR_CONSUMER_KEY, :P_OCR_CONSUMER_KEY, :P_OST_TOKEN, :P_OCT_TOKEN, :P_ROWS, :P_RESULT); END;';
 
         // parse sql
-        $stmt = oci_parse($this->conn, $sql) || die('Can not parse query');
+        $stmt = oci_parse($this->conn, $sql) || exit('Can not parse query');
 
         // Bind In and Out Variables
         oci_bind_by_name($stmt, ':P_OPTION_FLAG', $optionsFlag, 255);

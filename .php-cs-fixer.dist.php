@@ -83,8 +83,8 @@ return (new PhpCsFixer\Config())
         'phpdoc_summary' => false,
         'protected_to_private' => false,
         'self_accessor' => false,
-        'single_line_throw' => false,
-        'no_alias_language_construct_call' => false,
+        'single_line_throw' => true,
+        'no_alias_language_construct_call' => true,
         'visibility_required' => false,
         'ordered_imports' => true,
         'global_namespace_import' => [
@@ -104,7 +104,8 @@ return (new PhpCsFixer\Config())
         'array_syntax' => [
             'syntax' => 'short',
         ],
-        'phpdoc_annotation_without_dot' => false,
+        'phpdoc_annotation_without_dot' => true,
+        'no_blank_lines_after_phpdoc' => true,
         'logical_operators' => true,
         'php_unit_test_case_static_method_calls' => ['call_type' => 'this'],
         'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
