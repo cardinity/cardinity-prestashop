@@ -180,19 +180,19 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         //
         // The owner of the consumer_key is either the user or nobody (public consumer key)
         /*$secrets = $this->query_row_assoc('
-                SELECT	ocr_consumer_key		as consumer_key,
-                        ocr_consumer_secret		as consumer_secret,
-                        oct_token				as token,
-                        oct_token_secret		as token_secret,
-                        ocr_signature_methods	as signature_methods
+                SELECT  ocr_consumer_key        as consumer_key,
+                        ocr_consumer_secret     as consumer_secret,
+                        oct_token               as token,
+                        oct_token_secret        as token_secret,
+                        ocr_signature_methods   as signature_methods
                 FROM oauth_consumer_registry
                     JOIN oauth_consumer_token ON oct_ocr_id_ref = ocr_id
                 WHERE ocr_server_uri_host = \'%s\'
                   AND ocr_server_uri_path = LEFT(\'%s\', LENGTH(ocr_server_uri_path))
                   AND (ocr_usa_id_ref = %s OR ocr_usa_id_ref IS NULL)
-                  AND oct_usa_id_ref	  = %d
+                  AND oct_usa_id_ref      = %d
                   AND oct_token_type      = \'access\'
-                  AND oct_name			  = \'%s\'
+                  AND oct_name            = \'%s\'
                   AND oct_token_ttl       >= NOW()
                 ORDER BY ocr_usa_id_ref DESC, ocr_consumer_secret DESC, LENGTH(ocr_server_uri_path) DESC
                 LIMIT 0,1
@@ -251,16 +251,16 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         //
         // Take the most recent token of the given type
         /*$r = $this->query_row_assoc('
-                    SELECT	ocr_consumer_key		as consumer_key,
-                            ocr_consumer_secret		as consumer_secret,
-                            oct_token				as token,
-                            oct_token_secret		as token_secret,
-                            oct_name				as token_name,
-                            ocr_signature_methods	as signature_methods,
-                            ocr_server_uri			as server_uri,
-                            ocr_request_token_uri	as request_token_uri,
-                            ocr_authorize_uri		as authorize_uri,
-                            ocr_access_token_uri	as access_token_uri,
+                    SELECT  ocr_consumer_key        as consumer_key,
+                            ocr_consumer_secret     as consumer_secret,
+                            oct_token               as token,
+                            oct_token_secret        as token_secret,
+                            oct_name                as token_name,
+                            ocr_signature_methods   as signature_methods,
+                            ocr_server_uri          as server_uri,
+                            ocr_request_token_uri   as request_token_uri,
+                            ocr_authorize_uri       as authorize_uri,
+                            ocr_access_token_uri    as access_token_uri,
                             IF(oct_token_ttl >= \'9999-12-31\', NULL, UNIX_TIMESTAMP(oct_token_ttl) - UNIX_TIMESTAMP(NOW())) as token_ttl
                     FROM oauth_consumer_registry
                             JOIN oauth_consumer_token
@@ -1204,7 +1204,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         {
             $this->query('
                         DELETE FROM oauth_server_token
-                        WHERE ost_token 	 = \'%s\'
+                        WHERE ost_token      = \'%s\'
                           AND ost_token_type = \'access\'
                         ', $token);
         }
@@ -1212,7 +1212,7 @@ abstract class OAuthStoreOracle extends OAuthStoreAbstract
         {
             $this->query('
                         DELETE FROM oauth_server_token
-                        WHERE ost_token 	 = \'%s\'
+                        WHERE ost_token      = \'%s\'
                           AND ost_token_type = \'access\'
                           AND ost_usa_id_ref = %d
                         ', $token, $user_id);

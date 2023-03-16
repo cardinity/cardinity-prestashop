@@ -142,7 +142,7 @@ class OAuthRequestSigner extends OAuthRequest
 
         $signature = $this->calculateSignature($secrets['consumer_secret'], $token_secret, $token_type);
         $this->setParam('oauth_signature', $signature, true);
-        // $this->setParam('oauth_signature',		 urldecode($signature), true);
+        // $this->setParam('oauth_signature',        urldecode($signature), true);
 
         $this->signed = true;
         $this->usr_id = $usr_id;

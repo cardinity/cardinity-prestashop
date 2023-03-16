@@ -208,11 +208,11 @@ class Cardinity extends PaymentModule
     {
         $thisYear = (int) Date("Y");
         $years = '';
-        for ($i = $thisYear; $i >= $thisYear -10 ; $i--) {
+        for ($i = $thisYear; $i >= $thisYear -10; $i--) {
             $years .= "<option>$i</option>";
         }
         $months = '';
-        for ($i = 1; $i <= 12 ; $i++) {
+        for ($i = 1; $i <= 12; $i++) {
             $months .= "<option>$i</option>";
         }
 
@@ -467,7 +467,7 @@ class Cardinity extends PaymentModule
         /*$fp = fopen($transactionFile, 'a');//opens file in append mode
         fwrite($fp, ' this is additional text ');
         fwrite($fp, 'appending data');
-        fclose($fp);  			*/
+        fclose($fp);            */
     }
 
     /* Checkout payment gateway */
