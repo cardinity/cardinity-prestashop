@@ -2,3 +2,4 @@
 .idea/
 dist/
 .php-cs-fixer.cache
+tools/php-cs-fixer/vendor
