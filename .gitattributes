@@ -1,4 +1,4 @@
-*              eol=lf
+* text             eol=lf
 
 dist            export-ignore
 tools           export-ignore
