@@ -1,0 +1,8 @@
+*text             eol=lf
+
+dist            export-ignore
+tools           export-ignore
+.gitattributes  export-ignore
+.gitignore      export-ignore
+.php-cs-fixer.dist.php      export-ignore
+.php-cs-fixer.cache      export-ignore

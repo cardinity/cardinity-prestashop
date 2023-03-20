@@ -1,17 +1,45 @@
 <?php
 /**
- * Cardinity for Prestashop 1.7.x
+ * MIT License
  *
- * @author    Cardinity
- * @copyright 2017
- * @license   The MIT License (MIT)
- * @link      https://cardinity.com
+ * Copyright (c) 2023 Cardinity Payment Gateway
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    Cardinity <info@cardinity.com>
+ *  @copyright 2023 Cardinity Payment Gateway
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
  */
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
-include_once(_PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthStore.php');
-include_once(_PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthRequester.php');
+include_once _PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthStore.php';
+include_once _PS_MODULE_DIR_ . 'cardinity/libraries/OAuth/OAuthRequester.php';
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -19,27 +47,26 @@ if (!defined('_PS_VERSION_')) {
 
 class Cardinity extends PaymentModule
 {
-
     public $consumer_key;
     public $consumer_secret;
-    public $supported_currencies = array('EUR', 'USD', 'GBP');
+    public $supported_currencies = ['EUR', 'USD', 'GBP'];
 
     public function __construct()
     {
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-        $this->version = '4.0.5';
+        $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
+        $this->version = '4.0.6';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
-        $config = Configuration::getMultiple(array(
+        $config = Configuration::getMultiple([
             'CARDINITY_CONSUMER_KEY',
             'CARDINITY_CONSUMER_SECRET',
             'CARDINITY_EXTERNAL',
             'CARDINITY_PROJECT_KEY',
-            'CARDINITY_PROJECT_SECRET'
-        ));
+            'CARDINITY_PROJECT_SECRET',
+        ]);
 
         $this->consumer_key = (isset($config['CARDINITY_CONSUMER_KEY'])) ? $config['CARDINITY_CONSUMER_KEY'] : 0;
         $this->consumer_secret = (isset($config['CARDINITY_CONSUMER_SECRET'])) ? $config['CARDINITY_CONSUMER_SECRET'] : 0;
@@ -74,7 +101,7 @@ class Cardinity extends PaymentModule
         $order_pending = new OrderState();
         $order_pending->module_name = $this->name;
         foreach (Language::getLanguages() as $language) {
-            if (Tools::strtolower($language['iso_code']) == 'lt') {
+            if ('lt' == Tools::strtolower($language['iso_code'])) {
                 $order_pending->name[$language['id_lang']] = 'Laukiama apmokėjimo banko kortele';
             } else {
                 $order_pending->name[$language['id_lang']] = 'Awaiting Credit Card Payment';
@@ -87,7 +114,7 @@ class Cardinity extends PaymentModule
         $order_pending->logable = 0;
 
         if ($order_pending->add()) {
-            copy(_PS_ROOT_DIR_ . '/modules/cardinity/views/img/creditcards.gif', _PS_ROOT_DIR_ . '/img/os/' . (int)$order_pending->id . '.gif');
+            copy(_PS_ROOT_DIR_ . '/modules/cardinity/views/img/creditcards.gif', _PS_ROOT_DIR_ . '/img/os/' . (int) $order_pending->id . '.gif');
         }
 
         Configuration::updateValue('CARDINITY_PENDING', $order_pending->id);
@@ -99,7 +126,7 @@ class Cardinity extends PaymentModule
     {
         $order_state_pending = new OrderState(Configuration::get('CARDINITY_PENDING'));
 
-        return (
+        return
             Configuration::deleteByName('CARDINITY_CONSUMER_KEY')
             && Configuration::deleteByName('CARDINITY_CONSUMER_SECRET')
             && Configuration::deleteByName('CARDINITY_PROJECT_KEY')
@@ -108,7 +135,7 @@ class Cardinity extends PaymentModule
             && Configuration::deleteByName('CARDINITY_PENDING')
             && $order_state_pending->delete()
             && parent::uninstall()
-        );
+        ;
     }
 
     private function createTable()
@@ -121,7 +148,7 @@ class Cardinity extends PaymentModule
                     PRIMARY KEY (`id`, `id_shop`, `id_payment`)
                 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=UTF8;';
 
-        $result = (bool)Db::getInstance()->execute($sql);
+        $result = (bool) Db::getInstance()->execute($sql);
 
         return $result;
     }
@@ -158,29 +185,27 @@ class Cardinity extends PaymentModule
     {
         $logMessage = '';
 
-        if(isset($_POST['subaction']) && $_POST['subaction']== 'downloadlog'){            
+        if ('downloadlog' == Tools::getValue('subaction', false)) {
+            $currentFilename = 'transactions-' . Tools::getValue('year') . '-' . Tools::getValue('month');
 
-            $currentFilename = "transactions-". $_POST['year'] .'-'. $_POST['month'];
-            
             $currentDir = dirname(__FILE__);
-            $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'var'.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR . $currentFilename .'.log';
-            
+            $transactionFile = $currentDir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . $currentFilename . '.log';
 
-			$downloadFileName = 'crd-'.$currentFilename.'-'.time().'.log';
+            $downloadFileName = 'crd-' . $currentFilename . '-' . time() . '.log';
 
-			if (file_exists($transactionFile)) {
-				header('Content-Description: File Transfer');
-				header('Content-Type: application/octet-stream');
-				header('Content-Disposition: attachment; filename="'.basename($downloadFileName).'"');
-				header('Expires: 0');
-				header('Cache-Control: must-revalidate');
-				header('Pragma: public');
-				header('Content-Length: ' . filesize($transactionFile));
+            if (file_exists($transactionFile)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename($downloadFileName) . '"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($transactionFile));
                 readfile($transactionFile);
-                
-				//exit;
-			}else{
-                $logMessage = "<div class='alert alert-info'>No transaction log found for - ".$_POST['year'] .' / '. $_POST['month']." .</div>";
+
+            // exit;
+            } else {
+                $logMessage = "<div class='alert alert-info'>No transaction log found for - " . Tools::getValue('yesar') . ' / ' . Tools::getValue('month') . ' .</div>';
             }
         }
 
@@ -206,120 +231,120 @@ class Cardinity extends PaymentModule
         return $this->display(__FILE__, 'views/templates/admin/infos.tpl');
     }
 
-    private function displayTransactionHistory($logMessage){
-
-        $thisYear = (int) Date("Y");
+    private function displayTransactionHistory($logMessage)
+    {
+        $thisYear = (int) date('Y');
         $years = '';
-        for($i = $thisYear; $i >= $thisYear -10 ; $i--){
+        for ($i = $thisYear; $i >= $thisYear - 10; --$i) {
             $years .= "<option>$i</option>";
         }
         $months = '';
-        for($i = 1; $i <= 12 ; $i++){
+        for ($i = 1; 12 >= $i; ++$i) {
             $months .= "<option>$i</option>";
         }
-        
+
         $this->context->smarty->assign(
-            array(
+            [
                 'allYearOptions' => $years,
                 'allMonthOptions' => $months,
-                'message' => $logMessage
-            )
+                'message' => $logMessage,
+            ]
         );
-        
+
         return $this->display(__FILE__, 'views/templates/admin/transactions.tpl');
     }
 
     /* Renders admin module configuration form */
     public function renderForm()
     {
-        $fields_form = array(
-            'form' => array(
-                'legend' => array(
+        $fields_form = [
+            'form' => [
+                'legend' => [
                     'title' => $this->l('Settings'),
-                    'icon' => 'icon-cogs'
-                ),
+                    'icon' => 'icon-cogs',
+                ],
                 'description' => $this->l('Please, enter your Cardinity credentials. You can find them on your Cardinity members area under Integration -> API Settings.'),
-                'input' => array(
-                    array(
+                'input' => [
+                    [
                         'type' => 'text',
                         'label' => $this->l('Consumer Key'),
                         'name' => 'consumer_key',
-                        'required' => true
-                    ),
-                    array(
+                        'required' => true,
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Consumer Secret'),
                         'name' => 'consumer_secret',
-                        'required' => true
-                    ),
-                    array(
+                        'required' => true,
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('External checkout option'),
                         'name' => 'external',
                         'desc' => $this->l('Enable to send your customers to Cardinity External Checkout page.'),
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Enabled')
-                            ),
-                            array(
+                                'label' => $this->l('Enabled'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('Disabled')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('Disabled'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Project Key'),
                         'name' => 'project_key',
-                        'required' => false
-                    ),
-                    array(
+                        'required' => false,
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Project Secret'),
                         'name' => 'project_secret',
-                        'required' => false
-                    )
-                ),
-                'submit' => array(
+                        'required' => false,
+                    ],
+                ],
+                'submit' => [
                     'title' => $this->l('Save'),
-                )
-            ),
-        );
+                ],
+            ],
+        ];
 
         $helper = new HelperForm();
         $helper->show_toolbar = false;
         $helper->table = $this->table;
-        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
+        $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
-        $this->fields_form = array();
-        $helper->id = (int)Tools::getValue('id_carrier');
+        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ?: 0;
+        $this->fields_form = [];
+        $helper->id = (int) Tools::getValue('id_carrier');
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnSubmit';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
             . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = array(
+        $helper->tpl_vars = [
             'fields_value' => $this->getConfigFieldsValues(),
             'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id
-        );
+            'id_language' => $this->context->language->id,
+        ];
 
-        return $helper->generateForm(array($fields_form));
+        return $helper->generateForm([$fields_form]);
     }
 
     public function getConfigFieldsValues()
     {
-        return array(
+        return [
             'consumer_key' => Configuration::get('CARDINITY_CONSUMER_KEY'),
             'consumer_secret' => Configuration::get('CARDINITY_CONSUMER_SECRET'),
             'external' => Configuration::get('CARDINITY_EXTERNAL'),
             'project_key' => Configuration::get('CARDINITY_PROJECT_KEY'),
-            'project_secret' => Configuration::get('CARDINITY_PROJECT_SECRET')
-        );
+            'project_secret' => Configuration::get('CARDINITY_PROJECT_SECRET'),
+        ];
     }
 
     public function getSupportedCurrencies($id_shop = null)
@@ -330,9 +355,9 @@ class Cardinity extends PaymentModule
                 FROM `' . _DB_PREFIX_ . 'module_currency` mc
                 LEFT JOIN `' . _DB_PREFIX_ . 'currency` c ON c.`id_currency` = mc.`id_currency`
                 WHERE c.`deleted` = 0
-                    AND mc.`id_module` = ' . (int)$this->id . '
+                    AND mc.`id_module` = ' . (int) $this->id . '
                     AND c.`active` = 1
-                    AND mc.id_shop = ' . (int)$id_shop . '
+                    AND mc.id_shop = ' . (int) $id_shop . '
                     AND c.`iso_code` IN ("' . implode('", "', $this->supported_currencies) . '")
                 ORDER BY c.`name` ASC';
 
@@ -368,26 +393,26 @@ class Cardinity extends PaymentModule
 
     public function sendRequest($url, $method, $data)
     {
-        $options = array(
+        $options = [
             'consumer_key' => $this->consumer_key,
-            'consumer_secret' => $this->consumer_secret
-        );
+            'consumer_secret' => $this->consumer_secret,
+        ];
 
         OAuthStore::instance('2Leg', $options);
 
         $request = new OAuthRequester($url, $method, null);
 
         $oaheader = $request->getAuthorizationHeader();
-        $headers = array('Content-Type: application/json', 'Authorization: ' . $oaheader);
+        $headers = ['Content-Type: application/json', 'Authorization: ' . $oaheader];
 
-        $curl_options = array(
+        $curl_options = [
             CURLOPT_URL => $url,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POST => 1,
             CURLOPT_POSTFIELDS => Tools::jsonEncode($data),
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_SSL_VERIFYPEER => false
-        );
+            CURLOPT_SSL_VERIFYPEER => false,
+        ];
 
         $response = $request->doRequest(0, $curl_options);
 
@@ -398,18 +423,17 @@ class Cardinity extends PaymentModule
     {
         $state = $order->getCurrentState();
 
-
         if ($order->id
             && $order->module == $this->name
-            //&& $this->context->cookie->id_customer == $order->id_customer
+            // && $this->context->cookie->id_customer == $order->id_customer
             && !$order->valid
-            && $state != (int)Configuration::get('PS_OS_CANCELED')
+            && $state != (int) Configuration::get('PS_OS_CANCELED')
         ) {
             return true;
         }
 
-        PrestaShopLogger::addLog("Attempt Validating Order Payment : id = $order->id, customer on cookie = ".$this->context->cookie->id_customer.", customer on order =  $order->id_customer ", 1, $state, null, null, true);
-        PrestaShopLogger::addLog("Failed Validating Order Payment", 1, $state, null, null, true);
+        PrestaShopLogger::addLog("Attempt Validating Order Payment : id = $order->id, customer on cookie = " . $this->context->cookie->id_customer . ", customer on order =  $order->id_customer ", 1, $state, null, null, true);
+        PrestaShopLogger::addLog('Failed Validating Order Payment', 1, $state, null, null, true);
 
         return false;
     }
@@ -419,7 +443,7 @@ class Cardinity extends PaymentModule
         $id_shop = Context::getContext()->shop->id;
 
         $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'cardinity (id_shop, id_payment, id_order)
-                VALUES (' . (int)$id_shop . ', "' . pSQL($response->id) . '", ' . (int)$order_id . ')';
+                VALUES (' . (int) $id_shop . ', "' . pSQL($response->id) . '", ' . (int) $order_id . ')';
 
         Db::getInstance()->execute($sql);
     }
@@ -438,38 +462,37 @@ class Cardinity extends PaymentModule
     {
         $history = new OrderHistory();
         $history->id_order = $order->id;
-        $history->changeIdOrderState((int)Configuration::get('PS_OS_PAYMENT'), $order->id);
-        $history->addWithemail(true, array(
+        $history->changeIdOrderState((int) Configuration::get('PS_OS_PAYMENT'), $order->id);
+        $history->addWithemail(true, [
             'order_name' => $order->id,
-        ));
+        ]);
 
-        if($transactionLogData){
+        if ($transactionLogData) {
             $this->addTransactionHistory($transactionLogData);
         }
     }
 
-    public function addTransactionHistory($data){
-
-        $currentFilename = "transactions-".date("Y-n").'.log';
-       
+    public function addTransactionHistory($data)
+    {
+        $currentFilename = 'transactions-' . date('Y-n') . '.log';
 
         $currentDir = dirname(__FILE__);
 
-        $transactionFile = $currentDir .DIRECTORY_SEPARATOR . ".."  .DIRECTORY_SEPARATOR. ".."  .DIRECTORY_SEPARATOR .'var'.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.$currentFilename;
-        //$transactionFile = WP_CONTENT_DIR.'/uploads/wc-logs/cardinity-transactions.log';
+        $transactionFile = $currentDir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . $currentFilename;
+        // $transactionFile = WP_CONTENT_DIR.'/uploads/wc-logs/cardinity-transactions.log';
 
-        $message = "";
+        $message = '';
         if (!file_exists($transactionFile)) {
-         $message = "OrderID :: PaymentID :: 3dsVersion :: Amount :: Status\n";
-        }       
-        $message .= implode(" :: ",$data);
-        
-        file_put_contents($transactionFile, $message."\n", FILE_APPEND);
+            $message = "OrderID :: PaymentID :: 3dsVersion :: Amount :: Status\n";
+        }
+        $message .= implode(' :: ', $data);
 
-        /*$fp = fopen($transactionFile, 'a');//opens file in append mode  
-        fwrite($fp, ' this is additional text ');  
-        fwrite($fp, 'appending data');  
-        fclose($fp);  			*/
+        file_put_contents($transactionFile, $message . "\n", FILE_APPEND);
+
+        /*$fp = fopen($transactionFile, 'a');//opens file in append mode
+        fwrite($fp, ' this is additional text ');
+        fwrite($fp, 'appending data');
+        fclose($fp);            */
     }
 
     /* Checkout payment gateway */
@@ -484,22 +507,20 @@ class Cardinity extends PaymentModule
             return;
         }
 
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'this_path' => $this->_path,
             'this_path_ssl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
-                . htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8') . __PS_BASE_URI__ . 'modules/' . $this->name . '/'
-        ));
-        if (Configuration::get('CARDINITY_EXTERNAL') == 1) {
-            $payment_options = array(
+                . htmlspecialchars($_SERVER['HTTP_HOST'], ENT_COMPAT, 'UTF-8') . __PS_BASE_URI__ . 'modules/' . $this->name . '/',
+        ]);
+        if (1 == Configuration::get('CARDINITY_EXTERNAL')) {
+            $payment_options = [
                 $this->getExternalPaymentOption($params),
-            );
+            ];
         } else {
-            $payment_options = array(
+            $payment_options = [
                 $this->getEmbeddedPaymentOption(),
-            );
+            ];
         }
-
-
 
         return $payment_options;
     }
@@ -512,72 +533,73 @@ class Cardinity extends PaymentModule
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
         $attributes = [
-            "amount" => number_format($params['cart']->getOrderTotal(true, Cart::BOTH), 2),
-            "currency" => $currency->iso_code,
-            "country" => $country->iso_code,
-            "order_id" => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
-            "description" => 'PS' . $params['cart']->id,
-            "project_id" => Configuration::get('CARDINITY_PROJECT_KEY'),
-            "return_url" => $this->context->link->getModuleLink($this->name, 'return'),
+            'amount' => number_format($params['cart']->getOrderTotal(true, Cart::BOTH), 2),
+            'currency' => $currency->iso_code,
+            'country' => $country->iso_code,
+            'order_id' => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
+            'description' => 'PS' . $params['cart']->id,
+            'project_id' => Configuration::get('CARDINITY_PROJECT_KEY'),
+            'return_url' => $this->context->link->getModuleLink($this->name, 'return'),
         ];
         ksort($attributes);
 
         $message = '';
         foreach ($attributes as $key => $value) {
-            $message .= $key.$value;
+            $message .= $key . $value;
         }
 
         $signature = hash_hmac('sha256', $message, $this->project_secret);
         $externalOption = new PaymentOption();
         $externalOption->setCallToActionText($this->l('Cardinity'))
-                       ->setAction($this->context->link->getModuleLink($this->name, 'redirect', array(), true))
-                       ->setInputs([
-                           'amount' => [
-                               'name' => 'amount',
-                               'type' => 'hidden',
-                               'value' => $attributes['amount']
-                           ],
-                           'currency' => [
-                                'name' => 'currency',
-                                'type' => 'hidden',
-                                'value' => $attributes['currency']
-                            ],
-                            'country' => [
-                                'name' => 'country',
-                                'type' => 'hidden',
-                                'value' => $attributes['country']
-                            ],
-                            'order_id' => [
-                                'name' => 'order_id',
-                                'type' => 'hidden',
-                                'value' => $attributes['order_id']
-                            ],
-                            'description' => [
-                                'name' => 'description',
-                                'type' => 'hidden',
-                                'value' => $attributes['description']
-                            ],
-                            'project_id' => [
-                                'name' => 'project_id',
-                                'type' => 'hidden',
-                                'value' => $attributes['project_id']
-                            ],
-                            'return_url' => [
-                                'name' => 'return_url',
-                                'type' => 'hidden',
-                                'value' => $attributes['return_url']
-                            ],
-                            'signature' => [
-                                'name' => 'signature',
-                                'type' => 'hidden',
-                                'value' => $signature
-                            ],
-                       ])
-                       ->setAdditionalInformation($this->context->smarty->fetch(_PS_MODULE_DIR_.$this->name.'/views/templates/hook/payment_external.tpl'))
-                       ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'));
+            ->setAction($this->context->link->getModuleLink($this->name, 'redirect', [], true))
+            ->setInputs([
+                'amount' => [
+                    'name' => 'amount',
+                    'type' => 'hidden',
+                    'value' => $attributes['amount'],
+                ],
+                'currency' => [
+                    'name' => 'currency',
+                    'type' => 'hidden',
+                    'value' => $attributes['currency'],
+                ],
+                'country' => [
+                    'name' => 'country',
+                    'type' => 'hidden',
+                    'value' => $attributes['country'],
+                ],
+                'order_id' => [
+                    'name' => 'order_id',
+                    'type' => 'hidden',
+                    'value' => $attributes['order_id'],
+                ],
+                'description' => [
+                    'name' => 'description',
+                    'type' => 'hidden',
+                    'value' => $attributes['description'],
+                ],
+                'project_id' => [
+                    'name' => 'project_id',
+                    'type' => 'hidden',
+                    'value' => $attributes['project_id'],
+                ],
+                'return_url' => [
+                    'name' => 'return_url',
+                    'type' => 'hidden',
+                    'value' => $attributes['return_url'],
+                ],
+                'signature' => [
+                    'name' => 'signature',
+                    'type' => 'hidden',
+                    'value' => $signature,
+                ],
+            ])
+            ->setAdditionalInformation($this->context->smarty->fetch(_PS_MODULE_DIR_ . $this->name . '/views/templates/hook/payment_external.tpl'))
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'))
+        ;
 
         PrestaShopLogger::addLog('Cardinity: External payment prep', 1, null, null, null, true);
-        PrestashopLogger::addLog('Cardinity '.json_encode($attributes), 1, null, null, null, true);
+        PrestashopLogger::addLog('Cardinity ' . json_encode($attributes), 1, null, null, null, true);
 
         return $externalOption;
     }
@@ -587,10 +609,12 @@ class Cardinity extends PaymentModule
     {
         $embeddedOption = new PaymentOption();
         $embeddedOption->setCallToActionText($this->l('Cardinity'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
-            //->setForm($this->generateForm())
+            ->setAction($this->context->link->getModuleLink($this->name, 'validation', [], true))
+            // ->setForm($this->generateForm())
             ->setAdditionalInformation($this->context->smarty->fetch('module:cardinity/views/templates/hook/payment.tpl'))
-            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'));
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'))
+        ;
+
         return $embeddedOption;
     }
 
@@ -600,20 +624,20 @@ class Cardinity extends PaymentModule
 
         if (in_array(
             $state,
-            array(
+            [
                 Configuration::get('PS_OS_PAYMENT'),
                 Configuration::get('PS_OS_OUTOFSTOCK'),
-            )
+            ]
         )) {
-            $this->smarty->assign(array(
+            $this->smarty->assign([
                 'total' => Tools::displayPrice(
                     $params['order']->getOrdersTotalPaid(),
                     new Currency($params['order']->id_currency),
                     false
                 ),
                 'status' => 'ok',
-                'id_order' => $params['order']->id
-            ));
+                'id_order' => $params['order']->id,
+            ]);
         } else {
             $this->smarty->assign('status', 'failed');
         }

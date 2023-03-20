@@ -65,11 +65,7 @@ Find the latest version of this extension here: https://github.com/cardinity/car
   
 | Version       | Description                                         |Link        |
 | ------------- |-----------------------------------------------------|------------|
-| 4.0.3 | Added transaction log | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.3">Download</a> |
-| 4.0.2 | Bug fix on external amount; Cleanup on presta syntax; Added optional patch for FrontController in repo | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.2">Download</a> |
-| 4.0.1 | updated to use Cardinity sdk v3, 3dsv2 secured, 3dsv2 > v1 fallback | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.1">Download</a> |
-| 3.0.0 | added binary | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v3.0.0">Download</a>
-| 2.0.0 | Release | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v2.0.0">Download</a>
+| 4.0.6 | Code standard changes for marketplace | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.6">Download</a> |
 </details>
 
 <details show>
@@ -77,7 +73,7 @@ Find the latest version of this extension here: https://github.com/cardinity/car
   
 | Version       | Description                                         |Link        |
 | ------------- |-----------------------------------------------------|------------|
-| v1.4.3 | Transaction log viewable from admin | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v1.4.3">Download</a> |
+| v1.4.4 | More Debug Log | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v1.4.4">Download</a> |
 </details>
 
 

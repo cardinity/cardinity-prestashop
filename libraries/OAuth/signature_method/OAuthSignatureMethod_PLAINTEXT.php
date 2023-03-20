@@ -1,10 +1,48 @@
 <?php
+/**
+ * MIT License
+ *
+ * Copyright (c) 2023 Cardinity Payment Gateway
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ *  @author    Cardinity <info@cardinity.com>
+ *  @copyright 2023 Cardinity Payment Gateway
+ *  @license   https://opensource.org/licenses/MIT  The MIT License
+ *
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
+ */
 
 /**
  * OAuth signature implementation using PLAINTEXT
  *
  * @version $Id$
+ *
  * @author Marc Worrell <marcw@pobox.com>
+ *
  * @date  Sep 8, 2008 12:09:43 PM
  *
  * The MIT License
@@ -29,52 +67,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+require_once dirname(__FILE__) . '/OAuthSignatureMethod.class.php';
 
-require_once dirname(__FILE__).'/OAuthSignatureMethod.class.php';
+class OAuthSignatureMethod_PLAINTEXT extends OAuthSignatureMethod
+{
+    public function name()
+    {
+        return 'PLAINTEXT';
+    }
 
+    /**
+     * Calculate the signature using PLAINTEXT
+     *
+     * @param OAuthRequest request
+     * @param string base_string
+     * @param string consumer_secret
+     * @param string token_secret
+     *
+     * @return string
+     */
+    public function signature($request, $base_string, $consumer_secret, $token_secret)
+    {
+        return $request->urlencode($request->urlencode($consumer_secret) . '&' . $request->urlencode($token_secret));
+    }
 
-class OAuthSignatureMethod_PLAINTEXT extends OAuthSignatureMethod {
+    /**
+     * Check if the request signature corresponds to the one calculated for the request.
+     *
+     * @param OAuthRequest request
+     * @param string base_string    data to be signed, usually the base string, can be a request body
+     * @param string consumer_secret
+     * @param string token_secret
+     * @param string signature        from the request, still urlencoded
+     *
+     * @return string
+     */
+    public function verify($request, $base_string, $consumer_secret, $token_secret, $signature)
+    {
+        $a = $request->urldecode($signature);
+        $b = $request->urldecode($this->signature($request, $base_string, $consumer_secret, $token_secret));
 
-	public function name()
-	{
-		return 'PLAINTEXT';
-	}
-
-
-	/**
-	 * Calculate the signature using PLAINTEXT
-	 *
-	 * @param OAuthRequest request
-	 * @param string base_string
-	 * @param string consumer_secret
-	 * @param string token_secret
-	 * @return string
-	 */
-	function signature($request, $base_string, $consumer_secret, $token_secret)
-	{
-		return $request->urlencode($request->urlencode($consumer_secret).'&'.$request->urlencode($token_secret));
-	}
-
-
-	/**
-	 * Check if the request signature corresponds to the one calculated for the request.
-	 *
-	 * @param OAuthRequest request
-	 * @param string base_string    data to be signed, usually the base string, can be a request body
-	 * @param string consumer_secret
-	 * @param string token_secret
-	 * @param string signature        from the request, still urlencoded
-	 * @return string
-	 */
-	public function verify($request, $base_string, $consumer_secret, $token_secret, $signature)
-	{
-		$a = $request->urldecode($signature);
-		$b = $request->urldecode($this->signature($request, $base_string, $consumer_secret, $token_secret));
-
-		return $request->urldecode($a) == $request->urldecode($b);
-	}
+        return $request->urldecode($a) == $request->urldecode($b);
+    }
 }
 
 /* vi:set ts=4 sts=4 sw=4 binary noeol: */
-
-?>
