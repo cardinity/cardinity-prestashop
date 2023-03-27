@@ -1,0 +1,10 @@
+{
+    "require": {
+        "friendsofphp/php-cs-fixer": "^3.15"
+    },
+    "require-dev": {
+        "prestashop/php-dev-tools": "^4.3"
+    },
+    "author": "PrestaShop",
+    "license": "AFL-3.0"
+}
