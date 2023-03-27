@@ -47,19 +47,9 @@ if (!defined('_PS_VERSION_')) {
 
 class Cardinity extends PaymentModule
 {
-    public string $consumer_key;
-    public string $consumer_secret;
-    public array $supported_currencies = ['EUR', 'USD', 'GBP'];
-
-    public bool $external;
-    public string $project_key;
-    public string $project_secret;
-
-    public string $page;
-    public string $displayName;
-    public string $description;
-    public string $confirmUninstall;
-
+    public $consumer_key;
+    public $consumer_secret;
+    public $supported_currencies = ['EUR', 'USD', 'GBP'];
 
     public function __construct()
     {
@@ -102,7 +92,7 @@ class Cardinity extends PaymentModule
         }
     }
 
-    public function install():bool
+    public function install()
     {
         if (!parent::install() || !$this->registerHook('paymentOptions') || !$this->registerHook('paymentReturn') || !$this->createTable()) {
             return false;
@@ -117,11 +107,11 @@ class Cardinity extends PaymentModule
                 $order_pending->name[$language['id_lang']] = 'Awaiting Credit Card Payment';
             }
         }
-        $order_pending->send_email = true;
-        $order_pending->invoice = true;
+        $order_pending->send_email = 0;
+        $order_pending->invoice = 0;
         $order_pending->color = '#4169E1';
         $order_pending->unremovable = false;
-        $order_pending->logable = true;
+        $order_pending->logable = 0;
 
         if ($order_pending->add()) {
             copy(_PS_ROOT_DIR_ . '/modules/cardinity/views/img/creditcards.gif', _PS_ROOT_DIR_ . '/img/os/' . (int) $order_pending->id . '.gif');
@@ -132,9 +122,9 @@ class Cardinity extends PaymentModule
         return true;
     }
 
-    public function uninstall(): bool
+    public function uninstall()
     {
-        $order_state_pending = new OrderState((int) Configuration::get('CARDINITY_PENDING'));
+        $order_state_pending = new OrderState(Configuration::get('CARDINITY_PENDING'));
 
         return
             Configuration::deleteByName('CARDINITY_CONSUMER_KEY')
@@ -148,7 +138,7 @@ class Cardinity extends PaymentModule
         ;
     }
 
-    private function createTable() : bool
+    private function createTable()
     {
         $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'cardinity` (
                     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -163,7 +153,7 @@ class Cardinity extends PaymentModule
         return $result;
     }
 
-    private function validatePostRequest() :bool
+    private function validatePostRequest()
     {
         if (Tools::getValue('consumer_key')) {
             if (empty(Tools::getValue('consumer_key'))) {
@@ -175,7 +165,7 @@ class Cardinity extends PaymentModule
     }
 
     /* Admin form submit */
-    private function processPostRequest():mixed
+    private function processPostRequest()
     {
         if (Tools::isSubmit('btnSubmit')) {
             if (Tools::getValue('consumer_key')) {
@@ -188,11 +178,10 @@ class Cardinity extends PaymentModule
                 return $this->displayConfirmation($this->l('Settings updated'));
             }
         }
-        return;
     }
 
     /* Admin module */
-    public function getContent():string
+    public function getContent()
     {
         $logMessage = '';
 
@@ -237,12 +226,12 @@ class Cardinity extends PaymentModule
     }
 
     /* Displays module info in admin */
-    private function displayInfos():string
+    private function displayInfos()
     {
         return $this->display(__FILE__, 'views/templates/admin/infos.tpl');
     }
 
-    private function displayTransactionHistory(string $logMessage):string
+    private function displayTransactionHistory($logMessage)
     {
         $thisYear = (int) date('Y');
         $years = '';
@@ -266,7 +255,7 @@ class Cardinity extends PaymentModule
     }
 
     /* Renders admin module configuration form */
-    public function renderForm():string
+    public function renderForm()
     {
         $fields_form = [
             'form' => [
@@ -331,6 +320,7 @@ class Cardinity extends PaymentModule
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ?: 0;
+        $this->fields_form = [];
         $helper->id = (int) Tools::getValue('id_carrier');
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnSubmit';
@@ -346,7 +336,7 @@ class Cardinity extends PaymentModule
         return $helper->generateForm([$fields_form]);
     }
 
-    public function getConfigFieldsValues() : array
+    public function getConfigFieldsValues()
     {
         return [
             'consumer_key' => Configuration::get('CARDINITY_CONSUMER_KEY'),
@@ -357,7 +347,7 @@ class Cardinity extends PaymentModule
         ];
     }
 
-    public function getSupportedCurrencies($id_shop = null):bool
+    public function getSupportedCurrencies($id_shop = null)
     {
         $id_shop = Context::getContext()->shop->id;
 
@@ -374,7 +364,7 @@ class Cardinity extends PaymentModule
         return Db::getInstance()->executeS($sql);
     }
 
-    public function checkSupportedCurrencies(): bool
+    public function checkSupportedCurrencies()
     {
         $currencies = $this->getSupportedCurrencies();
 
@@ -385,7 +375,7 @@ class Cardinity extends PaymentModule
         return false;
     }
 
-    public function makePayment($data):string
+    public function makePayment($data)
     {
         $url = 'https://api.cardinity.com/v1/payments';
         $method = 'POST';
@@ -393,7 +383,7 @@ class Cardinity extends PaymentModule
         return $this->sendRequest($url, $method, $data);
     }
 
-    public function finalizePayment($payment_id, $data):string
+    public function finalizePayment($payment_id, $data)
     {
         $url = 'https://api.cardinity.com/v1/payments/' . $payment_id;
         $method = 'PATCH';
@@ -401,7 +391,7 @@ class Cardinity extends PaymentModule
         return $this->sendRequest($url, $method, $data);
     }
 
-    public function sendRequest($url, $method, $data) :string
+    public function sendRequest($url, $method, $data)
     {
         $options = [
             'consumer_key' => $this->consumer_key,
@@ -429,7 +419,7 @@ class Cardinity extends PaymentModule
         return Tools::jsonDecode($response['body']);
     }
 
-    public function validateOrderPayment($order) :bool
+    public function validateOrderPayment($order)
     {
         $state = $order->getCurrentState();
 
@@ -448,7 +438,7 @@ class Cardinity extends PaymentModule
         return false;
     }
 
-    public function savePayment($response, $order_id) : bool
+    public function savePayment($response, $order_id)
     {
         $id_shop = Context::getContext()->shop->id;
 
@@ -459,7 +449,7 @@ class Cardinity extends PaymentModule
     }
 
     /* Gets id_order after 3d redirect */
-    public function getPaymentOrder($payment_id) : string
+    public function getPaymentOrder($payment_id)
     {
         $sql = 'SELECT id_order FROM ' . _DB_PREFIX_ . 'cardinity
                 WHERE id_payment = "' . pSQL($payment_id) . '"';
@@ -468,7 +458,7 @@ class Cardinity extends PaymentModule
     }
 
     /* Called then respons status == 'approved' */
-    public function approveOrderPayment($order, $transactionLogData = false) : void
+    public function approveOrderPayment($order, $transactionLogData = false)
     {
         $history = new OrderHistory();
         $history->id_order = $order->id;
@@ -482,7 +472,7 @@ class Cardinity extends PaymentModule
         }
     }
 
-    public function addTransactionHistory($data) : void
+    public function addTransactionHistory($data)
     {
         $currentFilename = 'transactions-' . date('Y-n') . '.log';
 
@@ -506,19 +496,17 @@ class Cardinity extends PaymentModule
     }
 
     /* Checkout payment gateway */
-    public function hookPaymentOptions($params) : array
+    public function hookPaymentOptions($params)
     {
-        $payment_options = [];
-
         if (!$this->active) {
-            return $payment_options;
+            return;
         }
 
         // Check supportive currencies
         if (!$this->checkSupportedCurrencies()) {
-            return $payment_options;
+            return;
         }
-        
+
         $this->context->smarty->assign([
             'this_path' => $this->_path,
             'this_path_ssl' => (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://')
@@ -537,7 +525,7 @@ class Cardinity extends PaymentModule
         return $payment_options;
     }
 
-    public function getExternalPaymentOption($params) : PaymentOption
+    public function getExternalPaymentOption($params)
     {
         // get currency
         $currency = new Currency($params['cart']->id_currency);
@@ -561,7 +549,6 @@ class Cardinity extends PaymentModule
         }
 
         $signature = hash_hmac('sha256', $message, $this->project_secret);
-        
         $externalOption = new PaymentOption();
         $externalOption->setCallToActionText($this->l('Cardinity'))
             ->setAction($this->context->link->getModuleLink($this->name, 'redirect', [], true))
@@ -618,12 +605,12 @@ class Cardinity extends PaymentModule
     }
 
     // After Payment Method was Checked - Method for Payment Options in 1.7
-    public function getEmbeddedPaymentOption() : PaymentOption
+    public function getEmbeddedPaymentOption()
     {
         $embeddedOption = new PaymentOption();
         $embeddedOption->setCallToActionText($this->l('Cardinity'))
             ->setAction($this->context->link->getModuleLink($this->name, 'validation', [], true))
-            ->setForm($this->generateForm())
+            // ->setForm($this->generateForm())
             ->setAdditionalInformation($this->context->smarty->fetch('module:cardinity/views/templates/hook/payment.tpl'))
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'))
         ;
