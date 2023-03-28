@@ -409,14 +409,14 @@ class Cardinity extends PaymentModule
             CURLOPT_URL => $url,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POST => 1,
-            CURLOPT_POSTFIELDS => Tools::jsonEncode($data),
+            CURLOPT_POSTFIELDS => json_encode($data),
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SSL_VERIFYPEER => false,
         ];
 
         $response = $request->doRequest(0, $curl_options);
 
-        return Tools::jsonDecode($response['body']);
+        return json_decode($response['body']);
     }
 
     public function validateOrderPayment($order)
