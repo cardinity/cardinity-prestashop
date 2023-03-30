@@ -3,10 +3,10 @@
 ini_set('memory_limit', '256M');
 
 $finder = PhpCsFixer\Finder::create()->in([
-    __DIR__ . '/controllers',
-    __DIR__ . '/libraries',
-    __DIR__ . '/views',
-    __DIR__ . '/translations',
+     '../../controllers',
+     '../../libraries',
+     '../../views',
+     '../../translations',
 ]);
 
 $licenseHeader = 'MIT License
