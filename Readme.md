@@ -35,7 +35,7 @@ After the installation, do not forget to change back the permissions of ```/modu
 
 <b>Click below to watch the tutorial:</b>  
   
-[![how to integrate cardinity into prestashop](https://i.ytimg.com/an_webp/lwKoIbM6kj8/mqdefault_6s.webp?du=3000&sqp=CNGq84EG&rs=AOn4CLDAAPU-y8nL17wzk7pM4ojqvABpoQ)](https://www.youtube.com/watch?v=lwKoIbM6kj8)
+[how to integrate cardinity into prestashop](https://www.youtube.com/watch?v=lwKoIbM6kj8)
 
 #### Method no. 1 (recommended)
 1) Go to your Prestashop admin panel.
@@ -104,6 +104,3 @@ payment gateway, credit card payment, online payment, credit card processing, on
 
   
  [▲ back to top](#Cardinity-Payment-Gateway-for-PrestaShop)
-<!--
-**fjundzer/fjundzer** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
