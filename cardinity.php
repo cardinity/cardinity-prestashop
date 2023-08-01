@@ -49,14 +49,13 @@ class Cardinity extends PaymentModule
 {
     public $consumer_key;
     public $consumer_secret;
-    public $supported_currencies = ['EUR', 'USD', 'GBP'];
-
+    
     public function __construct()
     {
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->version = '4.0.6';
+        $this->version = '4.0.7';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -358,7 +357,6 @@ class Cardinity extends PaymentModule
                     AND mc.`id_module` = ' . (int) $this->id . '
                     AND c.`active` = 1
                     AND mc.id_shop = ' . (int) $id_shop . '
-                    AND c.`iso_code` IN ("' . implode('", "', $this->supported_currencies) . '")
                 ORDER BY c.`name` ASC';
 
         return Db::getInstance()->executeS($sql);

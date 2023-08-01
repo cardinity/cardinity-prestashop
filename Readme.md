@@ -65,7 +65,7 @@ Find the latest version of this extension here: https://github.com/cardinity/car
   
 | Version       | Description                                         |Link        |
 | ------------- |-----------------------------------------------------|------------|
-| 4.0.6 | Code standard changes for marketplace | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.6">Download</a> |
+| 4.0.7 | Code standard changes for marketplace | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.7">Download</a> |
 </details>
 
 <details show>
