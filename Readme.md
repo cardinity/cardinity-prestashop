@@ -63,9 +63,9 @@ Find the latest version of this extension here: https://github.com/cardinity/car
 <details show>
   <summary>For PrestaShop 1.7.x</summary>
   
-| Version       | Description                                         |Link        |
-| ------------- |-----------------------------------------------------|------------|
-| 4.0.7 | Code standard changes for marketplace | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.7">Download</a> |
+| Version | Description                                                   | Link                                                                                         |
+|---------|---------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| 4.0.8   | Added seperate translation lang for changing name on checkout | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.8">Download</a> |
 </details>
 
 <details show>

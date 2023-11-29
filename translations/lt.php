@@ -37,6 +37,7 @@
  */
 global $_MODULE;
 $_MODULE = [];
+$_MODULE['<{cardinity}prestashop>cardinity_b41c958f4c9faf347fd8d65cd33ab206'] = 'Cardinity Payment Gateway';
 $_MODULE['<{cardinity}prestashop>cardinity_b08d142a6de465237eeade02f7f41b4a'] = 'Cardinity';
 $_MODULE['<{cardinity}prestashop>cardinity_25fdc461ff659364800eff3f29de30b6'] = 'Priimkite atsiskaitymus kredito ar debeto kortelėmis savo tinklapyje naudojantis Cardinity.';
 $_MODULE['<{cardinity}prestashop>cardinity_69a1a3ad8dd5da6db3c4da838a0cf9c7'] = 'Ar tikrai norite ištrinti savo informaciją?';
