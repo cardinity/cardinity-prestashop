@@ -61,7 +61,7 @@ class CardinityCvvModuleFrontController extends ModuleFrontController
         $this->context->smarty->assign([
             'this_path' => $this->module->getPathUri(),
             'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->module->name . '/',
-            'globalCSS' => _THEME_CSS_DIR_ . 'global.css',
+            'globalCSS' => _THEME_CSS_DIR_ . 'theme.css',
         ]);
 
         $this->setTemplate('module:cardinity/views/templates/front/cvv.tpl');

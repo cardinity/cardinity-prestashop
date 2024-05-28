@@ -59,6 +59,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
 
+        $this->context->controller->addJqueryPlugin('fancybox');
         $order_id = (int) Tools::getValue('order_id');
         $payment_id = trim(Tools::getValue('MD'));
         $threeDSSessionData = trim(Tools::getValue('threeDSSessionData'));
