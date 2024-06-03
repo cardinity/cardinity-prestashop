@@ -55,7 +55,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->version = '4.0.9';
+        $this->version = '4.0.10';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -530,6 +530,7 @@ class Cardinity extends PaymentModule
         // get address, from which we will get a country name and from that we will get a country code
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
+        $customer = new Customer($params['cart']->id);
         $attributes = [
             'amount' => number_format($params['cart']->getOrderTotal(true, Cart::BOTH), 2),
             'currency' => $currency->iso_code,
@@ -537,6 +538,7 @@ class Cardinity extends PaymentModule
             'order_id' => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
             'description' => 'PS' . $params['cart']->id,
             'project_id' => Configuration::get('CARDINITY_PROJECT_KEY'),
+            'email_address' => $customer->email,
             'return_url' => $this->context->link->getModuleLink($this->name, 'return'),
         ];
         ksort($attributes);
@@ -570,6 +572,11 @@ class Cardinity extends PaymentModule
                     'name' => 'order_id',
                     'type' => 'hidden',
                     'value' => $attributes['order_id'],
+                ],
+                'email_address' => [
+                    'name' => 'email_address',
+                    'type' => 'hidden',
+                    'value' => $attributes['email_address'],
                 ],
                 'description' => [
                     'name' => 'description',

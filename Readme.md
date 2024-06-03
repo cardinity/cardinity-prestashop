@@ -63,9 +63,9 @@ Find the latest version of this extension here: https://github.com/cardinity/car
 <details show>
   <summary>For PrestaShop 1.7.x</summary>
   
-| Version | Description                 | Link                                                                                         |
-|---------|-----------------------------|----------------------------------------------------------------------------------------------|
-| 4.0.9   | Fixed CVV note on checkout | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.9">Download</a> |
+| Version | Description                                      | Link                                                                                          |
+|---------|--------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 4.0.10  | Added Customer Email to 3ds validation parameter | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.10">Download</a> |
 </details>
 
 <details show>

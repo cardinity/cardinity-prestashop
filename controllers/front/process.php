@@ -210,6 +210,9 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                             'color_depth' => (int) strip_tags(trim(Tools::getValue('color_depth'))),
                             'time_zone' => (int) strip_tags(trim(Tools::getValue('time_zone'))),
                         ],
+                        'cardholder_info' => [
+                            'email_address' => $customer->email
+                        ]
                     ],
                 ];
 
