@@ -49,6 +49,12 @@ class Cardinity extends PaymentModule
 {
     public $consumer_key;
     public $consumer_secret;
+    public $external;
+    public $project_key;
+    public $project_secret;
+    public $page;
+    public $fields_form;
+
     
     public function __construct()
     {
