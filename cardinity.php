@@ -536,7 +536,7 @@ class Cardinity extends PaymentModule
         // get address, from which we will get a country name and from that we will get a country code
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
-        $customer = new Customer($params['cart']->id);
+        $customer = new Customer($params['cart']->id_customer);
         $attributes = [
             'amount' => number_format($params['cart']->getOrderTotal(true, Cart::BOTH), 2),
             'currency' => $currency->iso_code,
@@ -544,9 +544,11 @@ class Cardinity extends PaymentModule
             'order_id' => str_pad($params['cart']->id, 2, '0', STR_PAD_LEFT),
             'description' => 'PS' . $params['cart']->id,
             'project_id' => Configuration::get('CARDINITY_PROJECT_KEY'),
-            'email_address' => $customer->email,
             'return_url' => $this->context->link->getModuleLink($this->name, 'return'),
         ];
+        if($customer->email){
+            $attributes['email_address'] = $customer->email;
+        }
         ksort($attributes);
 
         $message = '';
