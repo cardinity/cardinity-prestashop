@@ -213,6 +213,12 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                     ],
                 ];
 
+                if($customer->email){
+                    $paymentParams['threeds2_data']['cardholder_info'] = [
+                        'email_address' => $customer->email
+                    ];
+                }
+
                 $logParams = $paymentParams;
                 unset($logParams['payment_instrument']);
                 PrestaShopLogger::addLog('Cardinity Creating ' . json_encode($logParams), 1, null, null, null, true);

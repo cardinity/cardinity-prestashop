@@ -49,13 +49,19 @@ class Cardinity extends PaymentModule
 {
     public $consumer_key;
     public $consumer_secret;
+    public $external;
+    public $project_key;
+    public $project_secret;
+    public $page;
+    public $fields_form;
+
     
     public function __construct()
     {
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->version = '4.0.9';
+        $this->version = '4.0.10';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -530,6 +536,7 @@ class Cardinity extends PaymentModule
         // get address, from which we will get a country name and from that we will get a country code
         $address = new Address($params['cart']->id_address_delivery);
         $country = new Country($address->id_country);
+        $customer = new Customer($params['cart']->id_customer);
         $attributes = [
             'amount' => number_format($params['cart']->getOrderTotal(true, Cart::BOTH), 2),
             'currency' => $currency->iso_code,
@@ -539,6 +546,9 @@ class Cardinity extends PaymentModule
             'project_id' => Configuration::get('CARDINITY_PROJECT_KEY'),
             'return_url' => $this->context->link->getModuleLink($this->name, 'return'),
         ];
+        if($customer->email){
+            $attributes['email_address'] = $customer->email;
+        }
         ksort($attributes);
 
         $message = '';
@@ -570,6 +580,11 @@ class Cardinity extends PaymentModule
                     'name' => 'order_id',
                     'type' => 'hidden',
                     'value' => $attributes['order_id'],
+                ],
+                'email_address' => [
+                    'name' => 'email_address',
+                    'type' => 'hidden',
+                    'value' => $attributes['email_address'],
                 ],
                 'description' => [
                     'name' => 'description',
