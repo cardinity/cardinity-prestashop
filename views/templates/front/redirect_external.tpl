@@ -29,6 +29,7 @@
             <input type="hidden" name="email_address" value="{$attributes['email_address']|escape:'htmlall':'UTF-8'}" />
 			<input type="hidden" name="project_id" value="{$attributes['project_id']|escape:'htmlall':'UTF-8'}" />
 			<input type="hidden" name="return_url" value="{$attributes['return_url']|escape:'htmlall':'UTF-8'}" />
+            <input type="hidden" name="notification_url" value="{$attributes['notification_url']|escape:'htmlall':'UTF-8'}" />
 			<input type="hidden" name="signature" value="{$attributes['signature']|escape:'htmlall':'UTF-8'}" />
       </form>
 

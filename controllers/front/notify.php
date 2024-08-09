@@ -45,11 +45,12 @@
  *
  * @see      https://cardinity.com
  */
-class CardinityReturnModuleFrontController extends ModuleFrontController
+class CardinityNotifyModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        PrestaShopLogger::addLog('Cardinity: External payment return', 1, null, null, null, true);
+
+        PrestaShopLogger::addLog('Cardinity: External payment notification received', 1, null, null, null, true);
         PrestashopLogger::addLog('Cardinity ' . json_encode($_POST), 1, null, null, null, true);
 
         $message = '';
@@ -66,57 +67,44 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
         $cart_id = Tools::getValue('order_id'); // $_POST['order_id'];
         $cart = new Cart($cart_id);
         $customer = new Customer($cart->id_customer);
+
         $postSignature = Tools::getValue('signature'); // $_POST['signature'];
         $postStatus = Tools::getValue('status'); // $_POST['status'];
 
         if ($signature == $postSignature && 'approved' == $postStatus) {
             // if everything is a success, mark the order as paid and redirect the client to a success page
-
-            $orderID = Order::getOrderByCartId((int)($cart_id));
-            $order = new Order($orderID);
-            PrestashopLogger::addLog('Cardinity Order Status' . $order->getCurrentState(), 1, null, null, null, true);
-
-            if($order->getCurrentState() == 2){
-                PrestashopLogger::addLog('Cardinity Order Already approved, redirect only', 1, null, null, null, true);
-            }else{
-                $this->module->validateOrder(
-                    $cart_id,
-                    Configuration::get('PS_OS_PAYMENT'),
-                    $cart->getOrderTotal(true, Cart::BOTH),
-                    $this->module->displayName,
-                    null,
-                    [],
-                    (int) Context::getContext()->currency->id,
-                    false,
-                    $customer->secure_key
-                );
-
-                $transactionData = [
-                    Tools::getValue('order_id'),
-                    Tools::getValue('id'),
-                    'unknown(external)',
-                    Tools::getValue('amount') . ' ' . Tools::getValue('currency'),
-                    Tools::getValue('status'),
-                ];
-
-                $this->module->addTransactionHistory($transactionData);
-            }
-
-            Tools::redirect(
-                'index.php?controller=order-confirmation&id_cart=' . $cart_id .
-                '&id_module=' . $this->module->id .
-                '&id_order=' . $cart_id .
-                '&key=' . $customer->secure_key
+            $this->module->validateOrder(
+                $cart_id,
+                Configuration::get('PS_OS_PAYMENT'),
+                $cart->getOrderTotal(true, Cart::BOTH),
+                $this->module->displayName,
+                null,
+                [],
+                (int) Context::getContext()->currency->id,
+                false,
+                $customer->secure_key
             );
 
+            $transactionData = [
+                Tools::getValue('order_id'),
+                Tools::getValue('id'),
+                'unknown(external)',
+                Tools::getValue('amount') . ' ' . Tools::getValue('currency'),
+                Tools::getValue('status'),
+            ];
 
+            $this->module->addTransactionHistory($transactionData);
+
+            echo "Notification OK";
+            exit();
         } else {
             /*
              * Log the transaction information if the order failed
              */
             error_log(json_encode($_POST));
 
-            return $this->setTemplate('module:cardinity/views/templates/front/payment_process_error_external.tpl');
+            echo "Notification Fail to update".print_r($_POST, true);
+            exit();
         }
     }
 }
