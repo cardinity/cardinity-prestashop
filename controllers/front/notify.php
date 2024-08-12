@@ -45,11 +45,11 @@
  *
  * @see      https://cardinity.com
  */
+if (!defined('_PS_VERSION_')) { exit; }
 class CardinityNotifyModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-
         PrestaShopLogger::addLog('Cardinity: External payment notification received', 1, null, null, null, true);
         PrestashopLogger::addLog('Cardinity ' . json_encode($_POST), 1, null, null, null, true);
 
@@ -96,15 +96,14 @@ class CardinityNotifyModuleFrontController extends ModuleFrontController
             $this->module->addTransactionHistory($transactionData);
 
             echo "Notification OK";
-            exit();
+            exit;
         } else {
             /*
              * Log the transaction information if the order failed
              */
             error_log(json_encode($_POST));
-
-            echo "Notification Fail to update".print_r($_POST, true);
-            exit();
+            echo "Notification Fail to update" . print_r($_POST, true);
+            exit;
         }
     }
 }

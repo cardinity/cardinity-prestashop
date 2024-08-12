@@ -55,7 +55,6 @@ class Cardinity extends PaymentModule
     public $page;
     public $fields_form;
 
-    
     public function __construct()
     {
         $this->name = 'cardinity';
@@ -210,7 +209,7 @@ class Cardinity extends PaymentModule
 
             // exit;
             } else {
-                $logMessage = "<div class='alert alert-info'>No transaction log found for - " . Tools::getValue('yesar') . ' / ' . Tools::getValue('month') . ' .</div>';
+                $logMessage = "No transaction log found for - " . Tools::getValue('yesar') . ' / ' . Tools::getValue('month');
             }
         }
 
@@ -547,7 +546,7 @@ class Cardinity extends PaymentModule
             'return_url' => $this->context->link->getModuleLink($this->name, 'return'),
             'notification_url' => $this->context->link->getModuleLink($this->name, 'notify'),
         ];
-        if($customer->email){
+        if ($customer->email) {
             $attributes['email_address'] = $customer->email;
         }
         ksort($attributes);

@@ -45,6 +45,7 @@
  *
  * @see      https://cardinity.com
  */
+if (!defined('_PS_VERSION_')) { exit; }
 class CardinityReturnModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
@@ -71,14 +72,13 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
 
         if ($signature == $postSignature && 'approved' == $postStatus) {
             // if everything is a success, mark the order as paid and redirect the client to a success page
-
-            $orderID = Order::getOrderByCartId((int)($cart_id));
+            $orderID = Order::getOrderByCartId((int) $cart_id);
             $order = new Order($orderID);
             PrestashopLogger::addLog('Cardinity Order Status' . $order->getCurrentState(), 1, null, null, null, true);
 
-            if($order->getCurrentState() == 2){
+            if ($order->getCurrentState() == 2) {
                 PrestashopLogger::addLog('Cardinity Order Already approved, redirect only', 1, null, null, null, true);
-            }else{
+            } else {
                 $this->module->validateOrder(
                     $cart_id,
                     Configuration::get('PS_OS_PAYMENT'),
@@ -108,14 +108,11 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
                 '&id_order=' . $cart_id .
                 '&key=' . $customer->secure_key
             );
-
-
         } else {
             /*
              * Log the transaction information if the order failed
              */
             error_log(json_encode($_POST));
-
             return $this->setTemplate('module:cardinity/views/templates/front/payment_process_error_external.tpl');
         }
     }

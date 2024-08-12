@@ -45,6 +45,7 @@
  *
  * @see      https://cardinity.com
  */
+if (!defined('_PS_VERSION_')) { exit; }
 class CardinityRedirectModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;

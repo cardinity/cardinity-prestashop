@@ -45,6 +45,7 @@
  *
  * @see      https://cardinity.com
  */
+if (!defined('_PS_VERSION_')) { exit; }
 class CardinityProcessModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
@@ -213,7 +214,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                     ],
                 ];
 
-                if($customer->email){
+                if ($customer->email) {
                     $paymentParams['threeds2_data']['cardholder_info'] = [
                         'email_address' => $customer->email
                     ];
