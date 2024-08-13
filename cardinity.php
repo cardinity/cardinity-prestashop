@@ -55,13 +55,12 @@ class Cardinity extends PaymentModule
     public $page;
     public $fields_form;
 
-    
     public function __construct()
     {
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->version = '4.0.10';
+        $this->version = '4.1.0';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -210,7 +209,7 @@ class Cardinity extends PaymentModule
 
             // exit;
             } else {
-                $logMessage = "<div class='alert alert-info'>No transaction log found for - " . Tools::getValue('yesar') . ' / ' . Tools::getValue('month') . ' .</div>';
+                $logMessage = 'No transaction log found for - ' . Tools::getValue('yesar') . ' / ' . Tools::getValue('month');
             }
         }
 
@@ -545,8 +544,9 @@ class Cardinity extends PaymentModule
             'description' => 'PS' . $params['cart']->id,
             'project_id' => Configuration::get('CARDINITY_PROJECT_KEY'),
             'return_url' => $this->context->link->getModuleLink($this->name, 'return'),
+            'notification_url' => $this->context->link->getModuleLink($this->name, 'notify'),
         ];
-        if($customer->email){
+        if ($customer->email) {
             $attributes['email_address'] = $customer->email;
         }
         ksort($attributes);
@@ -600,6 +600,11 @@ class Cardinity extends PaymentModule
                     'name' => 'return_url',
                     'type' => 'hidden',
                     'value' => $attributes['return_url'],
+                ],
+                'notification_url' => [
+                    'name' => 'notification_url',
+                    'type' => 'hidden',
+                    'value' => $attributes['notification_url'],
                 ],
                 'signature' => [
                     'name' => 'signature',

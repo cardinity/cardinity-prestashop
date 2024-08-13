@@ -36,7 +36,7 @@
  * to avoid any conflicts with others containers.
  */
 
-/**
+/*
  * Cardinity for Prestashop 1.7.x
  *
  * @author    Cardinity
@@ -45,6 +45,9 @@
  *
  * @see      https://cardinity.com
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 class CardinityProcessModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
@@ -213,9 +216,9 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
                     ],
                 ];
 
-                if($customer->email){
+                if ($customer->email) {
                     $paymentParams['threeds2_data']['cardholder_info'] = [
-                        'email_address' => $customer->email
+                        'email_address' => $customer->email,
                     ];
                 }
 

@@ -36,7 +36,7 @@
  * to avoid any conflicts with others containers.
  */
 
-/**
+/*
  * Cardinity for Prestashop 1.7.x
  *
  * @author    Cardinity
@@ -45,6 +45,9 @@
  *
  * @see      https://cardinity.com
  */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 class CardinityCvvModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
