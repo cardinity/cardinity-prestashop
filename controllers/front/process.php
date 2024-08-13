@@ -218,7 +218,7 @@ class CardinityProcessModuleFrontController extends ModuleFrontController
 
                 if ($customer->email) {
                     $paymentParams['threeds2_data']['cardholder_info'] = [
-                        'email_address' => $customer->email
+                        'email_address' => $customer->email,
                     ];
                 }
 
