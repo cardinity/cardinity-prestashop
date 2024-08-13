@@ -36,7 +36,7 @@
  * to avoid any conflicts with others containers.
  */
 
-/**
+/*
  * Cardinity for Prestashop 1.7.x
  *
  * @author    Cardinity
