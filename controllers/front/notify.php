@@ -36,7 +36,7 @@
  * to avoid any conflicts with others containers.
  */
 
-/**
+/*
  * Cardinity for Prestashop 1.7.x
  *
  * @author    Cardinity
@@ -45,7 +45,9 @@
  *
  * @see      https://cardinity.com
  */
-if (!defined('_PS_VERSION_')) { exit; }
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 class CardinityNotifyModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
@@ -95,14 +97,14 @@ class CardinityNotifyModuleFrontController extends ModuleFrontController
 
             $this->module->addTransactionHistory($transactionData);
 
-            echo "Notification OK";
+            echo 'Notification OK';
             exit;
         } else {
             /*
              * Log the transaction information if the order failed
              */
             error_log(json_encode($_POST));
-            echo "Notification Fail to update" . print_r($_POST, true);
+            echo 'Notification Fail to update' . print_r($_POST, true);
             exit;
         }
     }

@@ -45,7 +45,9 @@
  *
  * @see      https://cardinity.com
  */
-if (!defined('_PS_VERSION_')) { exit; }
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 class CardinityReturnModuleFrontController extends ModuleFrontController
 {
     public function postProcess()

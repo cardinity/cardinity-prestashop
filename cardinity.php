@@ -209,7 +209,7 @@ class Cardinity extends PaymentModule
 
             // exit;
             } else {
-                $logMessage = "No transaction log found for - " . Tools::getValue('yesar') . ' / ' . Tools::getValue('month');
+                $logMessage = 'No transaction log found for - ' . Tools::getValue('yesar') . ' / ' . Tools::getValue('month');
             }
         }
 
