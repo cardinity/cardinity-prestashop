@@ -60,7 +60,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->version = '4.1.0';
+        $this->version = '4.2.0';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -647,12 +647,14 @@ class Cardinity extends PaymentModule
                 Configuration::get('PS_OS_OUTOFSTOCK'),
             ]
         )) {
+            $currency = new Currency($params['order']->id_currency);
+            $formattedPrice = Context::getContext()->currentLocale->formatPrice(
+                $params['order']->getOrdersTotalPaid(),
+                $currency->iso_code
+            );
+
             $this->smarty->assign([
-                'total' => Tools::displayPrice(
-                    $params['order']->getOrdersTotalPaid(),
-                    new Currency($params['order']->id_currency),
-                    false
-                ),
+                'total' => $formattedPrice,
                 'status' => 'ok',
                 'id_order' => $params['order']->id,
             ]);
