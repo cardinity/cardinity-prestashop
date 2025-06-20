@@ -61,11 +61,11 @@ After the installation, do not forget to change back the permissions of ```/modu
 ### Downloads
 Find the latest version of this extension here: https://github.com/cardinity/cardinity-prestashop/releases
 <details show>
-  <summary>For PrestaShop 1.7.x</summary>
+  <summary>For PrestaShop 1.7.x - 9.x</summary>
   
-| Version | Description                                      | Link                                                                                          |
-|---------|--------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| 4.0.10  | Added Customer Email to 3ds validation parameter | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.0.10">Download</a> |
+| Version | Description                              | Link                                                                                          |
+|---------|------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 4.2.1  | Updated for compatibility prestashop 9.0 | <a href="https://github.com/cardinity/cardinity-prestashop/releases/tag/v4.2.1">Download</a> |
 </details>
 
 <details show>

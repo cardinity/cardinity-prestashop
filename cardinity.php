@@ -60,7 +60,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->version = '4.2.0';
+        $this->version = '4.2.1';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -232,7 +232,7 @@ class Cardinity extends PaymentModule
     /* Displays module info in admin */
     private function displayInfos()
     {
-        return $this->display(__FILE__, 'views/templates/admin/infos.tpl');
+        return $this->fetch('module:cardinity/views/templates/admin/infos.tpl');
     }
 
     private function displayTransactionHistory($logMessage)
@@ -255,7 +255,7 @@ class Cardinity extends PaymentModule
             ]
         );
 
-        return $this->display(__FILE__, 'views/templates/admin/transactions.tpl');
+        return $this->fetch('module:cardinity/views/templates/admin/transactions.tpl');
     }
 
     /* Renders admin module configuration form */
@@ -653,13 +653,13 @@ class Cardinity extends PaymentModule
                 $currency->iso_code
             );
 
-            $this->smarty->assign([
+            $this->context->smarty->assign([
                 'total' => $formattedPrice,
                 'status' => 'ok',
                 'id_order' => $params['order']->id,
             ]);
         } else {
-            $this->smarty->assign('status', 'failed');
+            $this->context->smarty->assign('status', 'failed');
         }
 
         return $this->fetch('module:cardinity/views/templates/hook/payment_return.tpl');
