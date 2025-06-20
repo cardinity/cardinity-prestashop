@@ -653,13 +653,13 @@ class Cardinity extends PaymentModule
                 $currency->iso_code
             );
 
-            $this->context->smarty->assign([
+            $this->smarty->assign([
                 'total' => $formattedPrice,
                 'status' => 'ok',
                 'id_order' => $params['order']->id,
             ]);
         } else {
-            $this->context->smarty->assign('status', 'failed');
+            $this->smarty->assign('status', 'failed');
         }
 
         return $this->fetch('module:cardinity/views/templates/hook/payment_return.tpl');
