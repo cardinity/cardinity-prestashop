@@ -104,6 +104,12 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
                 $this->module->addTransactionHistory($transactionData);
             }
 
+            // 1) Restore context
+            $this->context->cart = $cart;
+            $this->context->customer = $customer;
+            $this->context->currency = new Currency($cart->id_currency);
+            $this->context->language = new Language($cart->id_lang);
+
             Tools::redirect(
                 'index.php?controller=order-confirmation'
                 . '&id_cart=' . (int) $cart_id

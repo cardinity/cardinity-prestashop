@@ -243,17 +243,23 @@ class Cardinity extends PaymentModule
             $years .= "<option>$i</option>";
         }
         $months = '';
-        for ($i = 1; 12 >= $i; ++$i) {
+        for ($i = 1; $i <= 12; ++$i) {
             $months .= "<option>$i</option>";
         }
 
-        $this->context->smarty->assign(
-            [
-                'allYearOptions' => $years,
-                'allMonthOptions' => $months,
-                'message' => $logMessage,
-            ]
-        );
+        // ✅ Provide explicit safe defaults
+        $controller = Tools::getValue('controller', 'AdminModules');
+        $configure = Tools::getValue('configure', $this->name);
+        $token = Tools::getAdminTokenLite('AdminModules');
+
+        $this->context->smarty->assign([
+            'allYearOptions' => $years,
+            'allMonthOptions' => $months,
+            'message' => $logMessage,
+            'controller_safe' => $controller,
+            'configure_safe' => $configure,
+            'token_safe' => $token,
+        ]);
 
         return $this->fetch('module:cardinity/views/templates/admin/transactions.tpl');
     }
