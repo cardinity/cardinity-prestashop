@@ -639,6 +639,7 @@ class Cardinity extends PaymentModule
     public function hookPaymentReturn($params)
     {
         $state = $params['order']->getCurrentState();
+        $order = $params['order'];
 
         if (in_array(
             $state,
@@ -647,19 +648,24 @@ class Cardinity extends PaymentModule
                 Configuration::get('PS_OS_OUTOFSTOCK'),
             ]
         )) {
-            $currency = new Currency($params['order']->id_currency);
+            $currency = new Currency($order->id_currency);
             $formattedPrice = Context::getContext()->currentLocale->formatPrice(
-                $params['order']->getOrdersTotalPaid(),
+                $order->getOrdersTotalPaid(),
                 $currency->iso_code
             );
 
-            $this->smarty->assign([
+            $this->context->smarty->assign([
                 'total' => $formattedPrice,
                 'status' => 'ok',
-                'id_order' => $params['order']->id,
+                'id_order' => $order->id,
+                'link' => $this->context->link,
             ]);
         } else {
-            $this->smarty->assign('status', 'failed');
+            $this->context->smarty->assign([
+                'status' => 'failed',
+                'id_order' => $order->id,
+                'link' => $this->context->link,
+            ]);
         }
 
         return $this->fetch('module:cardinity/views/templates/hook/payment_return.tpl');
