@@ -662,6 +662,6 @@ class Cardinity extends PaymentModule
             $this->smarty->assign('status', 'failed');
         }
 
-        return $this->display(__FILE__, 'payment_return.tpl');
+        return $this->fetch('module:cardinity/views/templates/hook/payment_return.tpl');
     }
 }
