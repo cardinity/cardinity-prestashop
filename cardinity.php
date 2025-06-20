@@ -616,9 +616,6 @@ class Cardinity extends PaymentModule
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'))
         ;
 
-        PrestaShopLogger::addLog('Cardinity: External payment prep', 1, null, null, null, true);
-        PrestashopLogger::addLog('Cardinity ' . json_encode($attributes), 1, null, null, null, true);
-
         return $externalOption;
     }
 
