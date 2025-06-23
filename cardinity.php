@@ -60,7 +60,7 @@ class Cardinity extends PaymentModule
         $this->name = 'cardinity';
         $this->tab = 'payments_gateways';
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->version = '4.2.0';
+        $this->version = '4.2.1';
         $this->author = 'Cardinity';
         $this->module_key = 'dbc7d0655fa07a7fdafbc863104cc876';
 
@@ -232,7 +232,7 @@ class Cardinity extends PaymentModule
     /* Displays module info in admin */
     private function displayInfos()
     {
-        return $this->display(__FILE__, 'views/templates/admin/infos.tpl');
+        return $this->fetch('module:cardinity/views/templates/admin/infos.tpl');
     }
 
     private function displayTransactionHistory($logMessage)
@@ -243,19 +243,25 @@ class Cardinity extends PaymentModule
             $years .= "<option>$i</option>";
         }
         $months = '';
-        for ($i = 1; 12 >= $i; ++$i) {
+        for ($i = 1; $i <= 12; ++$i) {
             $months .= "<option>$i</option>";
         }
 
-        $this->context->smarty->assign(
-            [
-                'allYearOptions' => $years,
-                'allMonthOptions' => $months,
-                'message' => $logMessage,
-            ]
-        );
+        // ✅ Provide explicit safe defaults
+        $controller = Tools::getValue('controller', 'AdminModules');
+        $configure = Tools::getValue('configure', $this->name);
+        $token = Tools::getAdminTokenLite('AdminModules');
 
-        return $this->display(__FILE__, 'views/templates/admin/transactions.tpl');
+        $this->context->smarty->assign([
+            'allYearOptions' => $years,
+            'allMonthOptions' => $months,
+            'message' => $logMessage,
+            'controller_safe' => $controller,
+            'configure_safe' => $configure,
+            'token_safe' => $token,
+        ]);
+
+        return $this->fetch('module:cardinity/views/templates/admin/transactions.tpl');
     }
 
     /* Renders admin module configuration form */
@@ -616,9 +622,6 @@ class Cardinity extends PaymentModule
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/logo.gif'))
         ;
 
-        PrestaShopLogger::addLog('Cardinity: External payment prep', 1, null, null, null, true);
-        PrestashopLogger::addLog('Cardinity ' . json_encode($attributes), 1, null, null, null, true);
-
         return $externalOption;
     }
 
@@ -639,6 +642,7 @@ class Cardinity extends PaymentModule
     public function hookPaymentReturn($params)
     {
         $state = $params['order']->getCurrentState();
+        $order = $params['order'];
 
         if (in_array(
             $state,
@@ -647,21 +651,26 @@ class Cardinity extends PaymentModule
                 Configuration::get('PS_OS_OUTOFSTOCK'),
             ]
         )) {
-            $currency = new Currency($params['order']->id_currency);
+            $currency = new Currency($order->id_currency);
             $formattedPrice = Context::getContext()->currentLocale->formatPrice(
-                $params['order']->getOrdersTotalPaid(),
+                $order->getOrdersTotalPaid(),
                 $currency->iso_code
             );
 
-            $this->smarty->assign([
+            $this->context->smarty->assign([
                 'total' => $formattedPrice,
                 'status' => 'ok',
-                'id_order' => $params['order']->id,
+                'id_order' => $order->id,
+                'link' => $this->context->link,
             ]);
         } else {
-            $this->smarty->assign('status', 'failed');
+            $this->context->smarty->assign([
+                'status' => 'failed',
+                'id_order' => $order->id,
+                'link' => $this->context->link,
+            ]);
         }
 
-        return $this->display(__FILE__, 'payment_return.tpl');
+        return $this->fetch('module:cardinity/views/templates/hook/payment_return.tpl');
     }
 }

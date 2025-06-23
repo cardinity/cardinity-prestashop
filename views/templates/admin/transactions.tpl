@@ -3,7 +3,7 @@
 * @link         https://cardinity.com
 * @license      The MIT License (MIT)
 *}
-    <form method="POST" action="?controller={$smarty.get.controller|escape:'htmlall':'UTF-8'}&configure={$smarty.get.configure|escape:'htmlall':'UTF-8'}&token={$smarty.get.token|escape:'htmlall':'UTF-8'}">
+<form method="POST" action="?controller={$controller_safe|escape:'htmlall':'UTF-8'}&configure={$configure_safe|escape:'htmlall':'UTF-8'}&token={$token_safe|escape:'htmlall':'UTF-8'}">
         <div class="panel" id="fieldset_0">
             <div class="panel-heading">
                 <i class="icon-eye"></i> Transaction History

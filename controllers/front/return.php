@@ -74,7 +74,7 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
 
         if ($signature == $postSignature && 'approved' == $postStatus) {
             // if everything is a success, mark the order as paid and redirect the client to a success page
-            $orderID = Order::getOrderByCartId((int) $cart_id);
+            $orderID = Order::getIdByCartId((int) $cart_id);
             $order = new Order($orderID);
             PrestashopLogger::addLog('Cardinity Order Status' . $order->getCurrentState(), 1, null, null, null, true);
 
@@ -105,10 +105,11 @@ class CardinityReturnModuleFrontController extends ModuleFrontController
             }
 
             Tools::redirect(
-                'index.php?controller=order-confirmation&id_cart=' . $cart_id .
-                '&id_module=' . $this->module->id .
-                '&id_order=' . $cart_id .
-                '&key=' . $customer->secure_key
+                'index.php?controller=order-confirmation'
+                . '&id_cart=' . (int) $cart_id
+                . '&id_module=' . (int) $this->module->id
+                . '&id_order=' . (int) $orderID
+                . '&key=' . $customer->secure_key
             );
         } else {
             /*
